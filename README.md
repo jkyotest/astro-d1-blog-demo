@@ -4,6 +4,11 @@ A modern blog system built with Astro framework and Cloudflare D1 database, supp
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/jkyochen/astro-d1-blog)
 
+> [Demo](https://astro-d1-blog-demo.jkyo.workers.dev/)
+> 
+> [Demo's Admin Panel](https://astro-d1-blog-demo.jkyo.workers.dev/admin)
+> Password: admin123
+
 ## ✨ Features
 
 ### 🎯 Core Features
