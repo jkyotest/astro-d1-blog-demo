@@ -264,8 +264,8 @@ export function calculatePagination(total: number, page: number, limit: number) 
 // Simple authentication check
 export function verifyAdminPassword(password: string, envPassword?: string): boolean {
   if (!envPassword) {
-    // Default password for development environment
-    return password === 'admin123';
+    // No admin password configured - this is a security error
+    throw new Error('ADMIN_PASSWORD environment variable is not configured. Please set it using: npx wrangler secret put ADMIN_PASSWORD');
   }
   return password === envPassword;
 }

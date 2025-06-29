@@ -49,13 +49,6 @@ This is a modern, full-featured blog system built with Astro framework and Cloud
 - `npm run db:reset:local` - Reset local database and reinitialize
 - `npm run db:seed:local` - Add all seed data (tags, config, sample posts)
 
-### Database - Development Environment (remote)
-- `npm run db:migrate:dev` - Apply all migrations to dev database
-- `npm run db:init:dev` - Initialize dev database (basic setup)
-- `npm run db:init-full:dev` - Complete setup with sample data
-- `npm run db:reset:dev` - Reset dev database and reinitialize
-- `npm run db:seed:dev` - Add all seed data (tags, config, sample posts)
-
 ### Database - Production Environment
 - `npm run db:migrate:prod` - Apply all migrations to production database
 - `npm run db:init:prod` - Initialize production database (essential data only)
@@ -65,8 +58,8 @@ This is a modern, full-featured blog system built with Astro framework and Cloud
 - `npm run db:seed-config:prod` - Add site configuration
 
 ### Deployment
-- `npm run deploy` - Deploy to development environment
-- `npm run deploy:prod` - Deploy to production environment
+- `npm run deploy` - Deploy to production environment
+- `npm run check` - Validate build and configuration
 - `npm run cf-typegen` - Generate Cloudflare Worker types
 
 ## Architecture
@@ -291,29 +284,22 @@ npm run test:ui       # Visual test interface
 
 **Option 1: One-Click Deployment (Recommended)**
 1. **Initial Deployment**: Use the "Deploy to Cloudflare" button in README
-2. **Post-Deployment Configuration**:
+   - Cloudflare automatically creates D1 database
+   - Automatically updates `wrangler.toml` with database ID
+   - Deploys application with correct configuration
+2. **Post-Deployment Setup**:
    ```bash
-   # Create production database
-   npx wrangler d1 create blog-prod
+   # Set admin password (REQUIRED - no default password for security)
+   npx wrangler secret put ADMIN_PASSWORD
    
-   # Update wrangler.toml with the returned database ID
-   # Replace "your-prod-database-id-here" with actual ID
-   
-   # Set admin password
-   npx wrangler secret put ADMIN_PASSWORD --env production
-   
-   # Initialize database
+   # Initialize database with sample data
    npm run db:init-full:prod
-   
-   # Redeploy with database configuration
-   npm run deploy:prod
    ```
 
-**Option 2: Fork Repository and Manual Setup**
+**Option 2: Manual Setup**
 1. **Repository Setup**:
    ```bash
-   # Fork repository on GitHub, then clone
-   git clone https://github.com/YOUR_USERNAME/astro-d1-blog.git
+   git clone https://github.com/jkyochen/astro-d1-blog.git
    cd astro-d1-blog
    npm install
    ```
@@ -321,60 +307,66 @@ npm run test:ui       # Visual test interface
 2. **Database Setup**:
    ```bash
    # Create production database (note the database ID)
-   npx wrangler d1 create blog-prod
+   npx wrangler d1 create blog
    ```
 
 3. **Configuration Update**:
-   - Edit `wrangler.toml` and replace `your-prod-database-id-here` with actual database ID
-   - Commit the configuration changes to your forked repository
+   - Edit `wrangler.toml` and replace `placeholder-will-be-replaced-by-deploy-button` with actual database ID
 
 4. **Deploy**:
    ```bash
-   npm run check:prod    # Validate production config
-   npm run deploy:prod   # Deploy to production
+   # Set admin password (REQUIRED - no default password for security)
+   npx wrangler secret put ADMIN_PASSWORD
+   
+   # Initialize database
+   npm run db:init-full:prod
+   
+   # Deploy to production
+   npm run check    # Validate build and config
+   npm run deploy   # Deploy to production
    ```
 
-#### Development Deployment
+#### Local Development Setup
 ```bash
-# Create development database (if not exists)
-npx wrangler d1 create blog-dev
-
-# Update wrangler.toml with dev database ID
-# Replace "your-dev-database-id-here" with actual ID
-
-# Deploy to development environment
-npm run check         # Validate build and config
-npm run deploy        # Deploy to dev environment
+# Local development uses --local flag (no database configuration needed)
+npm run dev         # Start development server with local database
+npm run preview     # Preview production build locally
 ```
 
-#### Environment Configuration Requirements
+#### Environment Configuration
+
+**Simplified Configuration**:
+- **Default Environment**: Production environment (used by Deploy button)
+- **Local Development**: Uses `--local` flag, completely separate from production
+- **No separate dev environment**: Simplified to reduce complexity
 
 **Database Configuration**:
-- **Database IDs must be configured in `wrangler.toml`** - environment variable substitution is not supported
-- **Local Environment**: Uses `--local` flag, no database ID needed
-- **Development Environment**: Requires `your-dev-database-id-here` replacement
-- **Production Environment**: Requires `your-prod-database-id-here` replacement
+- **Production**: Configured in default `wrangler.toml` section
+- **Local**: Uses `--local` flag, stores data in `.wrangler/state/`
+- **Deploy Button**: Automatically creates database and updates configuration
 
 **Secrets Management**:
 ```bash
-# Set admin password for each environment
-npx wrangler secret put ADMIN_PASSWORD                    # Local/default
-npx wrangler secret put ADMIN_PASSWORD --env production   # Production
+# Set admin password
+npx wrangler secret put ADMIN_PASSWORD              # Production
+npx wrangler secret put ADMIN_PASSWORD --local      # Local development
 ```
 
 **Configuration Files**:
-- `wrangler.toml`: Database bindings and environment configurations
-- `.env.example`: Template for local development environment variables
-- Secrets are stored in Cloudflare and not visible in code
+- `wrangler.toml`: Single environment configuration (production)
+- `.env.example`: Template for local development variables
+- Secrets stored in Cloudflare, not visible in code
 
 #### Important Deployment Notes
 
-**GitHub Deployment Limitations**:
-- Database IDs cannot be environment variables in `wrangler.toml`
-- Users must fork repository and update database IDs manually
-- Sensitive data (admin passwords) are stored as Cloudflare secrets
+**Deploy to Cloudflare Button Benefits**:
+- Automatically creates and configures D1 database
+- No manual database ID configuration required
+- Immediate deployment with working configuration
+- Simplifies setup process significantly
+- **Still requires setting admin password for security**
 
-**Database Initialization**:
+**Database Initialization Options**:
 ```bash
 # Minimal setup (essential data only)
 npm run db:init:prod
@@ -384,9 +376,9 @@ npm run db:init-full:prod
 ```
 
 **Deployment Validation**:
-- Always run `npm run check:prod` before production deployment
-- Verify database connections after deployment
+- Run `npm run check` before deployment for validation
 - Test admin panel access with configured password
+- Verify database connectivity after deployment
 
 ### Styling and Theming
 - **Tailwind CSS**: Utility-first framework with custom configuration

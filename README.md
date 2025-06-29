@@ -4,8 +4,6 @@ A modern blog system built with Astro framework and Cloudflare D1 database, supp
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/jkyochen/astro-d1-blog)
 
-> **Quick Deploy**: Click the button above for instant deployment, then create your D1 database and update the database IDs in `wrangler.toml`.
-
 ## ✨ Features
 
 ### 🎯 Core Features
@@ -62,22 +60,16 @@ npm install
 cp .env.example .env
 
 # Set admin password for local development
-npx wrangler secret put ADMIN_PASSWORD --env=""
+ADMIN_PASSWORD=your-secure-password-here
 ```
 
-#### 3. **Create Local Database**
-```bash
-# Create local development database
-npx wrangler d1 create blog-local --local
-```
-
-#### 4. **Initialize Database**
+#### 3. **Initialize Database**
 ```bash
 # Initialize local database with sample data
 npm run db:init-full:local
 ```
 
-#### 5. **Start Development**
+#### 4. **Start Development**
 ```bash
 # Start development server
 npm run dev
@@ -93,58 +85,55 @@ Visit `http://localhost:4321` to view the blog, and `http://localhost:4321/admin
 ### Option 1: One-Click Deployment (Recommended)
 1. **Click the "Deploy to Cloudflare" button** at the top of this README
 2. **Login to your Cloudflare account** and follow the deployment wizard
-3. **After deployment**, you need to configure the database:
-   - Create production database: `npx wrangler d1 create blog-prod`
-   - Update `wrangler.toml` with your actual database ID (replace `your-prod-database-id-here`)
-   - Set admin password: `npx wrangler secret put ADMIN_PASSWORD --env production`
+3. **Cloudflare will automatically**:
+   - Create a D1 database for your blog
+   - Update the `wrangler.toml` configuration with the database ID
+   - Deploy your application
+4. **After deployment**, complete the setup:
+   - **Set admin password** (required): `npx wrangler secret put ADMIN_PASSWORD`
    - Initialize database: `npm run db:init-full:prod`
-   - Redeploy: `npm run deploy:prod`
 
-### Option 2: Fork Repository and Manual Setup
+### Option 2: Manual Setup
 
-#### 1. **Fork and Clone**
+#### 1. **Clone Repository**
 ```bash
-# Fork this repository on GitHub, then clone your fork
-git clone https://github.com/YOUR_USERNAME/astro-d1-blog.git
+git clone https://github.com/jkyochen/astro-d1-blog.git
 cd astro-d1-blog
 npm install
 ```
 
-#### 2. **Create Production Database**
+#### 2. **Create Database**
 ```bash
 # Create production database (note the database ID in output)
-npx wrangler d1 create blog-prod
+npx wrangler d1 create blog
 ```
 
 #### 3. **Update Configuration**
 Replace the database ID in `wrangler.toml`:
 ```toml
-# Find this line in wrangler.toml under [env.production]
-database_id = "your-prod-database-id-here"
-# Replace with your actual database ID from step 2
+# Find this line and replace with your actual database ID
+database_id = "placeholder-will-be-replaced-by-deploy-button"
 ```
 
-#### 4. **Set Admin Password**
+#### 4. **Set Admin Password & Initialize Database**
 ```bash
-# Set admin password for production environment
-npx wrangler secret put ADMIN_PASSWORD --env production
-```
+# Set admin password (REQUIRED - no default password)
+npx wrangler secret put ADMIN_PASSWORD
 
-#### 5. **Initialize Database**
-```bash
-# Initialize production database with sample data
+# Initialize database with sample data
 npm run db:init-full:prod
 ```
 
-#### 6. **Deploy**
+#### 5. **Deploy**
 ```bash
 # Deploy to production
-npm run deploy:prod
+npm run deploy
 ```
 
 ### 📝 Important Notes
-- **Database IDs must be configured in `wrangler.toml`** - they cannot be set as environment variables
-- **For GitHub deployment**: You'll need to update the database IDs in your forked repository
+- **Deploy to Cloudflare button handles database creation automatically**
+- **Admin password MUST be set** - there is no default password for security reasons
+- **Local development uses `--local` flag** and doesn't need database configuration
 - **Admin password is stored as a Cloudflare secret** and won't be visible in your code
 - **Use `npm run db:init:prod`** instead of `npm run db:init-full:prod` if you don't want sample data
 
@@ -193,22 +182,13 @@ npm run db:push      # Push schema changes
 npm run db:studio    # Open database studio
 ```
 
-### Database - Local Environment
+### Database - Local Environment (Development)
 ```bash
 npm run db:migrate:local      # Run local migrations
 npm run db:init:local         # Initialize local DB (basic)
 npm run db:init-full:local    # Initialize local DB with sample data
 npm run db:reset:local        # Reset local database
 npm run db:seed:local         # Add all seed data (tags, config, articles)
-```
-
-### Database - Development Environment
-```bash
-npm run db:migrate:dev        # Run dev migrations
-npm run db:init:dev           # Initialize dev DB (basic)
-npm run db:init-full:dev      # Initialize dev DB with sample data
-npm run db:reset:dev          # Reset dev database
-npm run db:seed:dev           # Add all seed data (tags, config, articles)
 ```
 
 ### Database - Production Environment
@@ -223,10 +203,8 @@ npm run db:seed-config:prod   # Add site config
 
 ### Deployment
 ```bash
-npm run deploy                # Deploy to development
-npm run deploy:prod           # Deploy to production
-npm run check                 # Check build config (dev)
-npm run check:prod            # Check build config (prod)
+npm run check                 # Validate build and config
+npm run deploy                # Deploy to production
 npm run cf-typegen            # Generate Cloudflare types
 ```
 
