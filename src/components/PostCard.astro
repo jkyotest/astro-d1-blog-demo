@@ -59,7 +59,7 @@ const linkUrl = isArticle ? `/articles/${post.slug}` : `/notes/${post.slug}`;
         <div class="flex flex-wrap gap-2">
           {post.tags && post.tags.length > 0 && post.tags.slice(0, 3).map((tag) => (
             <a 
-              href={`/articles?tag=${tag.slug || tag.name || tag}`}
+              href={`/posts?tag=${tag.slug || tag.name || tag}`}
               class="tag tag-primary"
             >
               {tag.name || tag}
@@ -113,7 +113,7 @@ const linkUrl = isArticle ? `/articles/${post.slug}` : `/notes/${post.slug}`;
         <div class="flex flex-wrap gap-2 pt-3">
           {post.tags.slice(0, 4).map((tag) => (
             <a 
-              href={`/notes?tag=${tag.slug || tag.name || tag}`}
+              href={`/posts?tag=${tag.slug || tag.name || tag}`}
               class="tag"
             >
               {tag.name || tag}
