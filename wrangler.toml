@@ -1,7 +1,7 @@
 # Wrangler configuration for Astro Blog with D1
 # For more details: https://developers.cloudflare.com/workers/wrangler/configuration/
 
-name = "blog"
+name = 'astro-d1-blog-demo'
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
 main = "./dist/_worker.js/index.js"
