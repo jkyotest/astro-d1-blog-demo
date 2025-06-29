@@ -92,6 +92,7 @@ Visit `http://localhost:4321` to view the blog, and `http://localhost:4321/admin
 4. **After deployment**, complete the setup:
    - **Set admin password** (required): `npx wrangler secret put ADMIN_PASSWORD`
    - Initialize database: `npm run db:init-full:prod`
+      - The "blog" parameter in this command must match the "Name your D1 Database" configured in step 3 for proper recognition.
 
 ### Option 2: Manual Setup
 
