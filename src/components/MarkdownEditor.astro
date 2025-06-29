@@ -23,7 +23,7 @@ const { id, name, placeholder = "Start typing your content...", required = false
 
 <style>
 	.markdown-editor :global(.EasyMDEContainer) {
-		@apply border border-slate-300 rounded-md;
+		@apply border border-light rounded-md;
 	}
 	
 	.markdown-editor :global(.EasyMDEContainer.easymde-focused) {
@@ -31,16 +31,16 @@ const { id, name, placeholder = "Start typing your content...", required = false
 	}
 	
 	.markdown-editor :global(.editor-toolbar) {
-		@apply border-b border-slate-200 bg-slate-50;
+		@apply border-b border-light bg-secondary;
 	}
 	
 	.markdown-editor :global(.editor-toolbar button) {
-		@apply text-slate-600 hover:text-accent hover:bg-accent/10;
+		@apply text-secondary hover:text-accent hover:bg-accent/10;
 		@apply transition-all duration-200;
 	}
 	
 	.markdown-editor :global(.editor-toolbar button i) {
-		@apply text-slate-600;
+		@apply text-secondary;
 	}
 	
 	.markdown-editor :global(.editor-toolbar button:hover i) {
@@ -53,7 +53,7 @@ const { id, name, placeholder = "Start typing your content...", required = false
 	
 	/* Ensure Font Awesome icons display correctly */
 	.markdown-editor :global(.editor-toolbar .fa) {
-		@apply text-slate-600;
+		@apply text-secondary;
 	}
 	
 	.markdown-editor :global(.editor-toolbar button:hover .fa) {
@@ -69,7 +69,7 @@ const { id, name, placeholder = "Start typing your content...", required = false
 	}
 	
 	.markdown-editor :global(.editor-toolbar i.separator) {
-		@apply border-l border-slate-300;
+		@apply border-l border-light;
 	}
 	
 	.markdown-editor :global(.CodeMirror) {
@@ -86,12 +86,12 @@ const { id, name, placeholder = "Start typing your content...", required = false
 	}
 	
 	.markdown-editor :global(.editor-preview) {
-		@apply bg-slate-50 prose prose-slate max-w-none p-4;
+		@apply bg-tertiary prose prose-slate max-w-none p-4;
 		min-height: 400px;
 	}
 	
 	.markdown-editor :global(.editor-preview-side) {
-		@apply bg-slate-50 prose prose-slate max-w-none p-4;
+		@apply bg-tertiary prose prose-slate max-w-none p-4;
 		min-height: 400px;
 	}
 	
@@ -121,19 +121,19 @@ const { id, name, placeholder = "Start typing your content...", required = false
 	}
 	
 	.markdown-editor :global(.editor-preview code) {
-		@apply bg-slate-100 text-red-600 px-1 rounded text-sm;
+		@apply bg-tertiary text-accent px-1 rounded text-sm;
 	}
 	
 	.markdown-editor :global(.editor-preview pre) {
-		@apply bg-slate-100 p-4 rounded-md overflow-x-auto mb-4;
+		@apply bg-tertiary p-4 rounded-md overflow-x-auto mb-4;
 	}
 	
 	.markdown-editor :global(.editor-preview blockquote) {
-		@apply border-l-4 border-slate-300 pl-4 italic text-slate-600 mb-4;
+		@apply border-l-4 border-light pl-4 italic text-secondary mb-4;
 	}
 	
 	.markdown-editor :global(.editor-preview a) {
-		@apply text-blue-600 underline hover:text-blue-800;
+		@apply text-accent underline hover:text-accent-hover;
 	}
 	
 	.markdown-editor :global(.editor-preview img) {
@@ -141,16 +141,16 @@ const { id, name, placeholder = "Start typing your content...", required = false
 	}
 	
 	.markdown-editor :global(.editor-preview table) {
-		@apply w-full border-collapse border border-slate-300 mb-4;
+		@apply w-full border-collapse border border-light mb-4;
 	}
 	
 	.markdown-editor :global(.editor-preview th),
 	.markdown-editor :global(.editor-preview td) {
-		@apply border border-slate-300 px-3 py-2;
+		@apply border border-light px-3 py-2;
 	}
 	
 	.markdown-editor :global(.editor-preview th) {
-		@apply bg-slate-100 font-bold;
+		@apply bg-tertiary font-bold;
 	}
 </style>
 

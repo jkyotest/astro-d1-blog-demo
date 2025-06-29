@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+  darkMode: ['class', '[data-theme="dark"]'],
   theme: {
     extend: {
       fontFamily: {
@@ -8,6 +9,25 @@ export default {
         'display': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'system-ui', 'sans-serif'],
       },
       colors: {
+        // Semantic color mapping for automatic theme switching
+        'white': 'rgb(255 255 255 / <alpha-value>)',
+        'black': 'rgb(0 0 0 / <alpha-value>)',
+        
+        // Override slate colors to use apple-gray in dark mode
+        'slate': {
+          50: 'rgb(248 250 252 / <alpha-value>)',   // apple-gray-50
+          100: 'rgb(241 245 249 / <alpha-value>)',  // apple-gray-100  
+          200: 'rgb(226 232 240 / <alpha-value>)',  // apple-gray-200
+          300: 'rgb(203 213 225 / <alpha-value>)',  // apple-gray-300
+          400: 'rgb(148 163 184 / <alpha-value>)',  // apple-gray-400
+          500: 'rgb(100 116 139 / <alpha-value>)',  // apple-gray-500
+          600: 'rgb(71 85 105 / <alpha-value>)',    // apple-gray-600
+          700: 'rgb(51 65 85 / <alpha-value>)',     // apple-gray-700
+          800: 'rgb(30 41 59 / <alpha-value>)',     // apple-gray-800
+          900: 'rgb(15 23 42 / <alpha-value>)',     // apple-gray-900
+          950: 'rgb(2 6 23 / <alpha-value>)',       // apple-gray-950
+        },
+        
         // Apple's Blue color palette
         'apple-blue': {
           50: '#f0f9ff',

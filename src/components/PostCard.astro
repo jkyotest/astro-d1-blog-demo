@@ -23,12 +23,12 @@ const linkUrl = isArticle ? `/articles/${post.slug}` : `/notes/${post.slug}`;
   {isArticle && (
     <div class="space-y-6">
       <!-- Header: Time and status -->
-      <div class="flex items-center justify-between text-sm text-apple-gray-500">
+      <div class="flex items-center justify-between text-sm text-muted">
         <time class="font-medium">
           <FormattedDate date={post.published_at || post.created_at} />
         </time>
         {post.status === 'draft' && (
-          <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-apple-orange/10 text-apple-orange border border-apple-orange/20">
+          <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-warning/10 text-warning border border-warning/20">
             Draft
           </span>
         )}
@@ -37,7 +37,7 @@ const linkUrl = isArticle ? `/articles/${post.slug}` : `/notes/${post.slug}`;
       <!-- Title and excerpt -->
       <div class="space-y-4">
         {post.title && (
-          <h2 class="text-2xl font-bold text-apple-gray-900 leading-tight tracking-tight group-hover:text-apple-blue-500 transition-all duration-300">
+          <h2 class="text-2xl font-bold text-primary leading-tight tracking-tight group-hover:text-accent transition-all duration-300">
             <a 
               href={linkUrl}
               class="block"
@@ -48,7 +48,7 @@ const linkUrl = isArticle ? `/articles/${post.slug}` : `/notes/${post.slug}`;
         )}
         
         {showExcerpt && post.excerpt && (
-          <p class="text-apple-gray-600 leading-relaxed line-clamp-3 text-lg">
+          <p class="text-secondary leading-relaxed line-clamp-3 text-lg">
             {post.excerpt}
           </p>
         )}
@@ -66,7 +66,7 @@ const linkUrl = isArticle ? `/articles/${post.slug}` : `/notes/${post.slug}`;
             </a>
           ))}
           {post.tags && post.tags.length > 3 && (
-            <span class="text-sm text-apple-gray-500 px-3 py-1">
+            <span class="text-sm text-muted px-3 py-1">
               +{post.tags.length - 3} more
             </span>
           )}
@@ -74,7 +74,7 @@ const linkUrl = isArticle ? `/articles/${post.slug}` : `/notes/${post.slug}`;
         
         <a 
           href={linkUrl}
-          class="text-sm font-semibold text-apple-blue-500 hover:text-apple-blue-600 transition-all duration-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 flex items-center gap-2"
+          class="text-sm font-semibold text-accent hover:text-accent-hover transition-all duration-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 flex items-center gap-2"
         >
           Read article
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,12 +89,12 @@ const linkUrl = isArticle ? `/articles/${post.slug}` : `/notes/${post.slug}`;
   {isNote && (
     <div class="space-y-5">
       <!-- Header: Time and status -->
-      <div class="flex items-center justify-between text-sm text-apple-gray-500">
+      <div class="flex items-center justify-between text-sm text-muted">
         <time class="font-medium">
           <FormattedDate date={post.published_at || post.created_at} />
         </time>
         {post.status === 'draft' && (
-          <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-apple-orange/10 text-apple-orange border border-apple-orange/20">
+          <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-warning/10 text-warning border border-warning/20">
             Draft
           </span>
         )}
@@ -103,7 +103,7 @@ const linkUrl = isArticle ? `/articles/${post.slug}` : `/notes/${post.slug}`;
       <!-- Content -->
       {post.content && (
         <div class="prose prose-apple-gray max-w-none">
-          <div class="text-apple-gray-700 leading-relaxed" set:html={processMarkdown(post.content)}>
+          <div class="text-secondary leading-relaxed" set:html={processMarkdown(post.content)}>
           </div>
         </div>
       )}
@@ -120,7 +120,7 @@ const linkUrl = isArticle ? `/articles/${post.slug}` : `/notes/${post.slug}`;
             </a>
           ))}
           {post.tags && post.tags.length > 4 && (
-            <span class="text-sm text-apple-gray-500 px-3 py-1">
+            <span class="text-sm text-muted px-3 py-1">
               +{post.tags.length - 4} more
             </span>
           )}

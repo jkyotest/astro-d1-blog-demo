@@ -2,6 +2,7 @@
 // Import the global.css file here so that it is included on
 // all pages through the use of the <BaseHead /> component.
 import '../styles/global.css';
+import Themes from 'astro-themes';
 
 interface Props {
 	title: string;
@@ -53,3 +54,6 @@ const {
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 {image && <meta property="twitter:image" content={new URL(image, Astro.url)} />}
+
+<!-- Theme Toggle -->
+<Themes />

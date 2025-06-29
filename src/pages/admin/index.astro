@@ -1,5 +1,6 @@
 ---
 import BaseHead from '../../components/BaseHead.astro';
+import ThemeToggle from '../../components/ThemeToggle.astro';
 import { SITE_TITLE } from '../../consts';
 
 const pageTitle = "Admin Dashboard";
@@ -15,25 +16,26 @@ const pageTitle = "Admin Dashboard";
 	</head>
 	<body>
 		<!-- Authentication check loading -->
-		<div id="auth-loading" class="min-h-screen bg-apple-gray-50 flex items-center justify-center">
+		<div id="auth-loading" class="min-h-screen bg-secondary flex items-center justify-center">
 			<div class="text-center">
-				<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-apple-blue-500 mx-auto mb-4"></div>
-				<p class="text-apple-gray-600">Checking login status...</p>
+				<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-accent mx-auto mb-4"></div>
+				<p class="text-secondary">Checking login status...</p>
 			</div>
 		</div>
 
 		<!-- Main interface -->
-		<div id="admin-content" class="hidden min-h-screen bg-apple-gray-50">
+		<div id="admin-content" class="hidden min-h-screen bg-secondary">
 			<!-- Top navigation -->
-			<nav class="glass border-b border-apple-gray-200/30">
+			<nav class="bg-surface border-b border-surface">
 				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div class="flex justify-between h-16">
 						<div class="flex items-center">
-							<h1 class="text-xl font-semibold text-apple-gray-900">
+							<h1 class="text-xl font-semibold text-primary">
 								{SITE_TITLE} - Admin Dashboard
 							</h1>
 						</div>
 						<div class="flex items-center space-x-4">
+							<ThemeToggle />
 							<a href="/" target="_blank" class="btn btn-ghost btn-sm">
 								View Site
 							</a>
@@ -48,66 +50,66 @@ const pageTitle = "Admin Dashboard";
 			<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
 				<!-- Statistics cards -->
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-					<div class="card p-6">
+					<div class="bg-primary shadow-sm rounded-lg p-6">
 						<div class="flex items-center">
 							<div class="flex-shrink-0">
-								<svg class="h-8 w-8 text-apple-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<svg class="h-8 w-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
 								</svg>
 							</div>
 							<div class="ml-5 w-0 flex-1">
 								<dl>
-									<dt class="text-sm font-medium text-apple-gray-500 truncate">Total Posts</dt>
-									<dd class="text-lg font-semibold text-apple-gray-900" id="total-posts">-</dd>
+									<dt class="text-sm font-medium text-muted truncate">Total Posts</dt>
+									<dd class="text-lg font-semibold text-primary" id="total-posts">-</dd>
 								</dl>
 							</div>
 						</div>
 					</div>
 
-					<div class="card p-6">
+					<div class="bg-primary shadow-sm rounded-lg p-6">
 						<div class="flex items-center">
 							<div class="flex-shrink-0">
-								<svg class="h-8 w-8 text-apple-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<svg class="h-8 w-8 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
 								</svg>
 							</div>
 							<div class="ml-5 w-0 flex-1">
 								<dl>
-									<dt class="text-sm font-medium text-apple-gray-500 truncate">Articles</dt>
-									<dd class="text-lg font-semibold text-apple-gray-900" id="articles-count">-</dd>
+									<dt class="text-sm font-medium text-muted truncate">Articles</dt>
+									<dd class="text-lg font-semibold text-primary" id="articles-count">-</dd>
 								</dl>
 							</div>
 						</div>
 					</div>
 
-					<div class="card p-6">
+					<div class="bg-primary shadow-sm rounded-lg p-6">
 						<div class="flex items-center">
 							<div class="flex-shrink-0">
-								<svg class="h-8 w-8 text-apple-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<svg class="h-8 w-8 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
 								</svg>
 							</div>
 							<div class="ml-5 w-0 flex-1">
 								<dl>
-									<dt class="text-sm font-medium text-apple-gray-500 truncate">Notes</dt>
-									<dd class="text-lg font-semibold text-apple-gray-900" id="short-posts">-</dd>
+									<dt class="text-sm font-medium text-muted truncate">Notes</dt>
+									<dd class="text-lg font-semibold text-primary" id="short-posts">-</dd>
 								</dl>
 							</div>
 						</div>
 					</div>
 
-					<div class="card p-6">
+					<div class="bg-primary shadow-sm rounded-lg p-6">
 						<div class="flex items-center">
 							<div class="flex-shrink-0">
-								<svg class="h-8 w-8 text-apple-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<svg class="h-8 w-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
 								</svg>
 							</div>
 							<div class="ml-5 w-0 flex-1">
 								<dl>
-									<dt class="text-sm font-medium text-apple-gray-500 truncate">Tags</dt>
-									<dd class="text-lg font-semibold text-apple-gray-900" id="total-tags">-</dd>
+									<dt class="text-sm font-medium text-muted truncate">Tags</dt>
+									<dd class="text-lg font-semibold text-primary" id="total-tags">-</dd>
 								</dl>
 							</div>
 						</div>
@@ -115,8 +117,8 @@ const pageTitle = "Admin Dashboard";
 				</div>
 
 				<!-- Quick actions -->
-				<div class="card p-8 mb-8">
-					<h2 class="text-lg font-semibold text-apple-gray-900 mb-6">Quick Actions</h2>
+				<div class="bg-primary shadow-sm rounded-lg p-8 mb-8">
+					<h2 class="text-lg font-semibold text-primary mb-6">Quick Actions</h2>
 					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
 						<a href="/admin/articles/new" class="btn btn-primary flex-col py-4 px-6">
 							<svg class="h-5 w-5 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,15 +161,15 @@ const pageTitle = "Admin Dashboard";
 				</div>
 
 				<!-- Recent posts -->
-				<div class="card">
-					<div class="px-8 py-6 border-b border-apple-gray-200">
-						<h2 class="text-lg font-semibold text-apple-gray-900">Recent Posts</h2>
+				<div class="bg-primary shadow-sm rounded-lg">
+					<div class="px-8 py-6 border-b border-light">
+						<h2 class="text-lg font-semibold text-primary">Recent Posts</h2>
 					</div>
 					<div class="p-8">
 						<div id="recent-posts" class="space-y-4">
 							<div class="animate-pulse">
-								<div class="h-4 bg-apple-gray-200 rounded w-3/4 mb-2"></div>
-								<div class="h-3 bg-apple-gray-200 rounded w-1/2"></div>
+								<div class="h-4 bg-tertiary rounded w-3/4 mb-2"></div>
+								<div class="h-3 bg-tertiary rounded w-1/2"></div>
 							</div>
 						</div>
 					</div>

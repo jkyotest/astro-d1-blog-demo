@@ -5,11 +5,11 @@ import AdminLayout from '../../components/AdminLayout.astro';
 <AdminLayout title="Manage Tags">
   <div class="space-y-6">
     <!-- Page Header -->
-    <div class="bg-white shadow-sm rounded-lg px-6 py-4">
+    <div class="bg-primary shadow-sm rounded-lg px-6 py-4">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-slate-900">Manage Tags</h1>
-          <p class="mt-1 text-sm text-slate-500">
+          <h1 class="text-2xl font-bold text-primary">Manage Tags</h1>
+          <p class="mt-1 text-sm text-muted">
             Add, edit, or remove tags used to categorize your content.
           </p>
         </div>
@@ -25,11 +25,11 @@ import AdminLayout from '../../components/AdminLayout.astro';
     </div>
 
     <!-- Add New Tag -->
-    <div class="bg-white shadow-sm rounded-lg p-6">
-      <h2 class="text-lg font-medium text-slate-900 mb-4">Add New Tag</h2>
+    <div class="bg-primary shadow-sm rounded-lg p-6">
+      <h2 class="text-lg font-medium text-primary mb-4">Add New Tag</h2>
       <form id="add-tag-form" class="flex items-end space-x-4">
         <div class="flex-1">
-          <label for="tag-name" class="block text-sm font-medium text-slate-700 mb-2">
+          <label for="tag-name" class="block text-sm font-medium text-secondary mb-2">
             Tag Name
           </label>
           <input
@@ -38,7 +38,7 @@ import AdminLayout from '../../components/AdminLayout.astro';
             name="name"
             required
             maxlength="20"
-            class="block w-full border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-accent focus:border-accent text-base py-3 px-4"
+            class="block w-full border-light rounded-lg shadow-sm focus:ring-2 focus:ring-accent focus:border-accent text-base py-3 px-4"
             placeholder="Enter tag name (max 20 characters)"
           />
         </div>
