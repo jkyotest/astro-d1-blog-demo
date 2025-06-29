@@ -113,7 +113,17 @@ const { title, description = "Blog admin dashboard" } = Astro.props;
 			// Global authenticated request function
 			window.authFetch = async function(url: string, options: RequestInit = {}) {
 				const token = localStorage.getItem('admin_token');
-				return fetch(url, {
+				const expires = localStorage.getItem('admin_token_expires');
+				
+				// Check if token is expired
+				if (!token || !expires || new Date(expires) < new Date()) {
+					localStorage.removeItem('admin_token');
+					localStorage.removeItem('admin_token_expires');
+					window.location.href = '/admin/login';
+					throw new Error('Authentication required');
+				}
+				
+				const response = await fetch(url, {
 					...options,
 					headers: {
 						...options.headers,
@@ -121,6 +131,16 @@ const { title, description = "Blog admin dashboard" } = Astro.props;
 						'Content-Type': 'application/json',
 					},
 				});
+				
+				// Check for 401 Unauthorized
+				if (response.status === 401) {
+					localStorage.removeItem('admin_token');
+					localStorage.removeItem('admin_token_expires');
+					window.location.href = '/admin/login';
+					throw new Error('Authentication failed');
+				}
+				
+				return response;
 			};
 		</script>
 	</body>
