@@ -55,12 +55,12 @@
     "db:init-full:local": "npm run db:migrate:local && npm run db:seed:local",
     "db:reset:local": "rm -rf .wrangler/state/v3/d1 && npm run db:init-full:local",
     "db:seed:local": "npx wrangler d1 execute blog --local --file=./scripts/seed-tags.sql && npx wrangler d1 execute blog --local --file=./scripts/seed-site-config.sql && npx wrangler d1 execute blog --local --file=./scripts/seed-data.sql",
-    "db:migrate:prod": "for f in ./migrations/*.sql; do npx wrangler d1 execute blog --remote --file=\"$f\"; done",
+    "db:migrate:prod": "for f in ./migrations/*.sql; do npx wrangler d1 execute blog-demo --remote --file=\"$f\"; done",
     "db:init:prod": "npm run db:migrate:prod && npm run db:seed:prod && npm run db:seed-config:prod",
     "db:init-full:prod": "npm run db:init:prod && npm run db:seed-data:prod",
-    "db:seed:prod": "npx wrangler d1 execute blog --remote --file=./scripts/seed-tags.sql",
-    "db:seed-data:prod": "npx wrangler d1 execute blog --remote --file=./scripts/seed-data.sql",
-    "db:seed-config:prod": "npx wrangler d1 execute blog --remote --file=./scripts/seed-site-config.sql"
+    "db:seed:prod": "npx wrangler d1 execute blog-demo --remote --file=./scripts/seed-tags.sql",
+    "db:seed-data:prod": "npx wrangler d1 execute blog-demo --remote --file=./scripts/seed-data.sql",
+    "db:seed-config:prod": "npx wrangler d1 execute blog-demo --remote --file=./scripts/seed-site-config.sql"
   },
   "type": "module"
 }

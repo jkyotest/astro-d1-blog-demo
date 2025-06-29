@@ -24,8 +24,8 @@ ENVIRONMENT = "production"
 # Deploy to Cloudflare button will automatically replace the database_id
 [[d1_databases]]
 binding = "DB"
-database_name = "blog"
-database_id = "placeholder-will-be-replaced-by-deploy-button"
+database_name = "blog-demo"
+database_id = "c081462c-a997-46c5-907d-79fff069b03f"
 
 # KV storage for sessions (commented out, uncomment when needed)
 # [[kv_namespaces]]
