@@ -21,11 +21,11 @@ const pageTitle = isEdit ? `Edit ${postType === 'article' ? 'Article' : 'Note'}`
 
 <div class="space-y-6">
   <!-- Page Header -->
-  <div class="card px-8 py-6">
+  <div class="bg-primary shadow-sm rounded-lg px-8 py-6">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-apple-gray-900">{pageTitle}</h1>
-        <p class="mt-1 text-sm text-apple-gray-500">
+        <h1 class="text-2xl font-bold text-primary">{pageTitle}</h1>
+        <p class="mt-1 text-sm text-muted">
           {postType === 'article' 
             ? isEdit 
               ? 'Edit existing long-form article with Markdown support.'
@@ -38,7 +38,7 @@ const pageTitle = isEdit ? `Edit ${postType === 'article' ? 'Article' : 'Note'}`
       </div>
       <div class="flex items-center space-x-3">
         <!-- Auto-save Status -->
-        <div id="auto-save-status" class="hidden items-center text-sm text-apple-gray-500">
+        <div id="auto-save-status" class="hidden items-center text-sm text-muted">
           <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
           </svg>

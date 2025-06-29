@@ -2,17 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== SEMANTIC THEME SYSTEM ===== */
+:root {
+  /* Layout & Background Colors */
+  --color-bg-primary: rgb(255, 255, 255);              /* white */
+  --color-bg-secondary: rgb(248, 250, 252);            /* apple-gray-50 */
+  --color-bg-tertiary: rgb(241, 245, 249);             /* apple-gray-100 */
+  --color-bg-surface: rgba(255, 255, 255, 0.8);        /* white/80 */
+  
+  /* Text Colors */
+  --color-text-primary: rgb(15, 23, 42);               /* apple-gray-900 */
+  --color-text-secondary: rgb(71, 85, 105);            /* apple-gray-600 */
+  --color-text-tertiary: rgb(100, 116, 139);           /* apple-gray-500 */
+  --color-text-muted: rgb(148, 163, 184);              /* apple-gray-400 */
+  
+  /* Border Colors */
+  --color-border-light: rgb(226, 232, 240);            /* apple-gray-200 */
+  --color-border-medium: rgb(203, 213, 225);           /* apple-gray-300 */
+  --color-border-surface: rgba(226, 232, 240, 0.6);    /* apple-gray-200/60 */
+  
+  /* Accent & Functional Colors */
+  --color-accent: rgb(14, 165, 233);                   /* apple-blue-500 */
+  --color-accent-hover: rgb(2, 132, 199);              /* apple-blue-600 */
+  --color-success: rgb(52, 199, 89);                   /* apple-green */
+  --color-success-hover: rgb(40, 167, 69);             /* darker green */
+  --color-warning: rgb(255, 149, 0);                   /* apple-orange */
+  --color-danger: rgb(255, 59, 48);                    /* apple-red */
+}
+
+[data-theme="dark"] {
+  /* Layout & Background Colors */
+  --color-bg-primary: rgb(30, 41, 59);                 /* apple-gray-800 */
+  --color-bg-secondary: rgb(15, 23, 42);               /* apple-gray-900 */
+  --color-bg-tertiary: rgb(51, 65, 85);                /* apple-gray-700 */
+  --color-bg-surface: rgba(30, 41, 59, 0.8);           /* apple-gray-800/80 */
+  
+  /* Text Colors */
+  --color-text-primary: rgb(241, 245, 249);            /* apple-gray-100 */
+  --color-text-secondary: rgb(148, 163, 184);          /* apple-gray-400 */
+  --color-text-tertiary: rgb(148, 163, 184);           /* apple-gray-400 */
+  --color-text-muted: rgb(100, 116, 139);              /* apple-gray-500 */
+  
+  /* Border Colors */
+  --color-border-light: rgb(51, 65, 85);               /* apple-gray-700 */
+  --color-border-medium: rgb(71, 85, 105);             /* apple-gray-600 */
+  --color-border-surface: rgba(51, 65, 85, 0.6);       /* apple-gray-700/60 */
+  
+  /* Accent colors remain the same but could be adjusted for dark mode */
+  --color-accent: rgb(14, 165, 233);                   /* apple-blue-500 */
+  --color-accent-hover: rgb(2, 132, 199);              /* apple-blue-600 */
+}
+
+/* ===== SEMANTIC CSS CLASSES ===== */
+@layer components {
+  /* Background utilities */
+  .bg-primary { background-color: var(--color-bg-primary); }
+  .bg-secondary { background-color: var(--color-bg-secondary); }
+  .bg-tertiary { background-color: var(--color-bg-tertiary); }
+  .bg-surface { background-color: var(--color-bg-surface); }
+  
+  /* Text utilities */
+  .text-primary { color: var(--color-text-primary); }
+  .text-secondary { color: var(--color-text-secondary); }
+  .text-tertiary { color: var(--color-text-tertiary); }
+  .text-muted { color: var(--color-text-muted); }
+  
+  /* Border utilities */
+  .border-light { border-color: var(--color-border-light); }
+  .border-medium { border-color: var(--color-border-medium); }
+  .border-surface { border-color: var(--color-border-surface); }
+  
+  /* Accent utilities */
+  .text-accent { color: var(--color-accent); }
+  .border-accent { border-color: var(--color-accent); }
+  .bg-accent { background-color: var(--color-accent); }
+  
+  .text-accent-hover { color: var(--color-accent-hover); }
+  .bg-accent-hover { background-color: var(--color-accent-hover); }
+  
+  /* Functional utilities */
+  .text-success { color: var(--color-success); }
+  .bg-success { background-color: var(--color-success); }
+  .bg-success-hover { background-color: var(--color-success-hover); }
+  .text-warning { color: var(--color-warning); }
+  .bg-warning { background-color: var(--color-warning); }
+  .text-danger { color: var(--color-danger); }
+  .bg-danger { background-color: var(--color-danger); }
+  
+  /* Hover states */
+  .hover\\:text-accent:hover { color: var(--color-accent); }
+  .hover\\:bg-accent:hover { background-color: var(--color-accent); }
+  .hover\\:text-accent-hover:hover { color: var(--color-accent-hover); }
+  .hover\\:bg-accent-hover:hover { background-color: var(--color-accent-hover); }
+  .hover\\:text-danger:hover { color: var(--color-danger); }
+  .hover\\:bg-success:hover { background-color: var(--color-success); }
+}
+
 /* Apple-style base styles */
 @layer base {
   html {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
     @apply scroll-smooth;
-    color-scheme: light;
+    color-scheme: light dark;
   }
   
   body {
-    @apply min-h-screen text-apple-gray-900 antialiased;
-    background: linear-gradient(180deg, #fafbfc 0%, #ffffff 100%);
+    @apply min-h-screen text-primary antialiased;
+    background: linear-gradient(180deg, var(--color-bg-secondary) 0%, var(--color-bg-primary) 100%);
     font-size: 17px; /* Apple's preferred body text size */
     line-height: 1.47058823529; /* Apple's Golden Ratio line height */
     letter-spacing: -0.022em; /* Apple's tracking for body text */
@@ -27,7 +123,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
     font-weight: 600;
     letter-spacing: -0.022em;
-    @apply text-apple-gray-900;
+    @apply text-primary;
   }
   
   h1 {
@@ -52,7 +148,7 @@
   }
   
   p {
-    @apply text-apple-gray-700;
+    @apply text-secondary;
     font-size: 17px;
     line-height: 1.47058823529;
     letter-spacing: -0.022em;
@@ -60,12 +156,12 @@
   
   /* Apple link styles */
   a {
-    @apply text-apple-blue-500 transition-colors duration-200;
+    @apply text-accent transition-colors duration-200;
     text-decoration: none;
   }
   
   a:hover {
-    @apply text-apple-blue-600;
+    @apply text-accent-hover;
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
@@ -73,14 +169,14 @@
   
   /* Apple focus styles */
   *:focus {
-    outline: 2px solid #007AFF;
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
   
   /* Selection styles */
   ::selection {
-    background-color: rgba(0, 122, 255, 0.15);
-    color: #007AFF;
+    background-color: rgba(14, 165, 233, 0.15);
+    color: var(--color-accent);
   }
 }
 
@@ -88,13 +184,13 @@
 @layer components {
 	/* Apple-style cards with glass morphism */
 	.card {
-		@apply bg-white/95 backdrop-blur-xl border border-apple-gray-200/40 shadow-apple;
+		@apply bg-white/95 dark:bg-apple-gray-900/95 backdrop-blur-xl border border-apple-gray-200/40 dark:border-apple-gray-700/40 shadow-apple;
 		border-radius: 16px; /* Apple's preferred card radius */
 		transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Apple's ease */
 	}
 	
 	.card-hover {
-		@apply hover:bg-white hover:border-apple-gray-300/60 hover:shadow-apple-lg;
+		@apply hover:bg-white dark:hover:bg-apple-gray-800 hover:border-apple-gray-300/60 dark:hover:border-apple-gray-600/60 hover:shadow-apple-lg;
 		transform: translateY(0);
 		transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 	}
@@ -116,7 +212,7 @@
 	}
 	
 	.card-footer {
-		@apply p-6 pt-0 border-t border-apple-gray-100;
+		@apply p-6 pt-0 border-t border-apple-gray-100 dark:border-apple-gray-700;
 	}
 	
 	/* Apple-style buttons - authentic design */
@@ -165,16 +261,31 @@
 		backdrop-filter: blur(10px);
 	}
 	
+	:root[data-theme="dark"] .btn-secondary {
+		background: rgba(255, 255, 255, 0.1);
+		color: #64B5F6;
+	}
+	
 	.btn-secondary:hover {
 		background: rgba(118, 118, 128, 0.16);
 		color: #0056cc;
 		transform: translateY(-0.5px);
 	}
 	
+	:root[data-theme="dark"] .btn-secondary:hover {
+		background: rgba(255, 255, 255, 0.15);
+		color: #42A5F5;
+	}
+	
 	.btn-secondary:active {
 		background: rgba(118, 118, 128, 0.2);
 		color: #004499;
 		transform: scale(0.98);
+	}
+	
+	:root[data-theme="dark"] .btn-secondary:active {
+		background: rgba(255, 255, 255, 0.2);
+		color: #2196F3;
 	}
 	
 	.btn-ghost {
@@ -269,7 +380,7 @@
 	
 	/* Apple-style navigation links */
 	.nav-link {
-		@apply text-apple-gray-600 font-medium transition-all duration-300;
+		@apply text-apple-gray-600 dark:text-apple-gray-400 font-medium transition-all duration-300;
 		font-size: 16px;
 		line-height: 1.25;
 		letter-spacing: -0.016em;
@@ -314,7 +425,7 @@
 	
 	/* Apple-style form elements */
 	.form-input {
-		@apply w-full bg-white/95 backdrop-blur-xl border border-apple-gray-200;
+		@apply w-full bg-white/95 dark:bg-apple-gray-800/95 backdrop-blur-xl border border-apple-gray-200 dark:border-apple-gray-700 text-apple-gray-900 dark:text-apple-gray-100;
 		padding: 16px 20px;
 		border-radius: 12px;
 		font-size: 17px;
@@ -324,7 +435,7 @@
 	}
 	
 	.form-input:focus {
-		@apply border-apple-blue-500 bg-white shadow-apple-md;
+		@apply border-apple-blue-500 bg-white dark:bg-apple-gray-800 shadow-apple-md;
 		outline: none;
 		transform: translateY(-1px);
 	}
@@ -353,13 +464,21 @@
 		line-height: 1.2;
 		letter-spacing: -0.015em;
 		background: rgba(0, 0, 0, 0.05);
-		@apply text-apple-gray-700;
+		@apply text-apple-gray-700 dark:text-apple-gray-300;
 		backdrop-filter: blur(20px);
+	}
+
+	:root[data-theme="dark"] .tag {
+		background: rgba(255, 255, 255, 0.1);
 	}
 	
 	.tag:hover {
 		background: rgba(0, 0, 0, 0.08);
 		transform: translateY(-1px);
+	}
+
+	:root[data-theme="dark"] .tag:hover {
+		background: rgba(255, 255, 255, 0.15);
 	}
 	
 	.tag-primary {
@@ -403,6 +522,11 @@
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
 		border: 1px solid rgba(255, 255, 255, 0.2);
+	}
+
+	:root[data-theme="dark"] .glass {
+		background: rgba(30, 41, 59, 0.8) !important; /* apple-gray-800 with opacity */
+		border: 1px solid rgba(71, 85, 105, 0.3) !important; /* apple-gray-600 with opacity */
 	}
 	
 	/* Apple-style hero text */
@@ -448,14 +572,14 @@
   
   /* Enhanced prose styles */
   .prose {
-    @apply text-apple-gray-700 leading-relaxed;
+    @apply text-apple-gray-700 dark:text-apple-gray-300 leading-relaxed;
     font-size: 17px;
     line-height: 1.47058823529;
     letter-spacing: -0.022em;
   }
   
   .prose-apple-gray {
-    @apply text-apple-gray-600;
+    @apply text-apple-gray-600 dark:text-apple-gray-400;
   }
   
   /* Mobile-optimized spacing */
@@ -583,8 +707,242 @@
     }
   }
   
-  /* Dark mode preparation */
-  @media (prefers-color-scheme: dark) {
-    /* Future dark mode styles can be added here */
+  /* Smart color mapping for automatic theme switching */
+  
+  /* White background automatically becomes dark */
+  :root[data-theme="dark"] .bg-white {
+    background-color: rgb(30 41 59) !important; /* apple-gray-800 */
+  }
+  
+  /* Slate backgrounds get proper dark mapping */
+  :root[data-theme="dark"] .bg-slate-50 {
+    background-color: rgb(30 41 59) !important; /* apple-gray-800 */
+  }
+  
+  :root[data-theme="dark"] .bg-slate-100 {
+    background-color: rgb(51 65 85) !important; /* apple-gray-700 */
+  }
+  
+  /* Text colors auto-switch */
+  :root[data-theme="dark"] .text-slate-900 {
+    color: rgb(241 245 249) !important; /* apple-gray-100 */
+  }
+  
+  :root[data-theme="dark"] .text-slate-800 {
+    color: rgb(226 232 240) !important; /* apple-gray-200 */
+  }
+  
+  :root[data-theme="dark"] .text-slate-700 {
+    color: rgb(203 213 225) !important; /* apple-gray-300 */
+  }
+  
+  :root[data-theme="dark"] .text-slate-600 {
+    color: rgb(148 163 184) !important; /* apple-gray-400 */
+  }
+  
+  :root[data-theme="dark"] .text-slate-500 {
+    color: rgb(148 163 184) !important; /* apple-gray-400 */
+  }
+  
+  /* Border colors */
+  :root[data-theme="dark"] .border-slate-200 {
+    border-color: rgb(51 65 85) !important; /* apple-gray-700 */
+  }
+  
+  :root[data-theme="dark"] .border-slate-300 {
+    border-color: rgb(71 85 105) !important; /* apple-gray-600 */
+  }
+  
+  /* Gradient backgrounds */
+  :root[data-theme="dark"] .from-slate-50 {
+    --tw-gradient-from: rgb(15 23 42) !important; /* apple-gray-900 */
+    --tw-gradient-to: rgb(15 23 42 / 0) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+  }
+  
+  :root[data-theme="dark"] .via-white {
+    --tw-gradient-to: rgb(30 41 59 / 0) !important; /* apple-gray-800 */
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(30 41 59), var(--tw-gradient-to) !important;
+  }
+  
+  :root[data-theme="dark"] .to-purple-50 {
+    --tw-gradient-to: rgb(88 28 135) !important; /* purple-900 equivalent */
+  }
+  
+  :root[data-theme="dark"] .to-emerald-50 {
+    --tw-gradient-to: rgb(6 78 59) !important; /* emerald-900 equivalent */
+  }
+  
+  /* Emerald colors for tags page */
+  :root[data-theme="dark"] .text-emerald-600 {
+    color: rgb(52 211 153) !important; /* emerald-400 */
+  }
+  
+  :root[data-theme="dark"] .text-emerald-500 {
+    color: rgb(52 211 153) !important; /* emerald-400 */
+  }
+  
+  :root[data-theme="dark"] .bg-emerald-100 {
+    background-color: rgb(6 78 59) !important; /* emerald-900 */
+  }
+  
+  :root[data-theme="dark"] .bg-emerald-200 {
+    background-color: rgb(20 83 45) !important; /* emerald-800 */
+  }
+  
+  :root[data-theme="dark"] .bg-emerald-600 {
+    background-color: rgb(16 185 129) !important; /* emerald-500 */
+  }
+  
+  :root[data-theme="dark"] .bg-emerald-700 {
+    background-color: rgb(5 150 105) !important; /* emerald-600 */
+  }
+  
+  :root[data-theme="dark"] .from-emerald-100 {
+    --tw-gradient-from: rgb(6 78 59) !important; /* emerald-900 */
+    --tw-gradient-to: rgb(6 78 59 / 0) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+  }
+  
+  :root[data-theme="dark"] .to-emerald-200 {
+    --tw-gradient-to: rgb(20 83 45) !important; /* emerald-800 */
+  }
+  
+  :root[data-theme="dark"] .group-hover\:from-emerald-200:hover {
+    --tw-gradient-from: rgb(6 78 59) !important; /* emerald-900 */
+  }
+  
+  :root[data-theme="dark"] .group-hover\:to-emerald-300:hover {
+    --tw-gradient-to: rgb(20 83 45) !important; /* emerald-800 */
+  }
+  
+  :root[data-theme="dark"] .group-hover\:text-emerald-600:hover {
+    color: rgb(52 211 153) !important; /* emerald-400 */
+  }
+  
+  /* Purple colors for posts page */
+  :root[data-theme="dark"] .text-purple-600 {
+    color: rgb(196 181 253) !important; /* purple-300 */
+  }
+  
+  :root[data-theme="dark"] .text-purple-700 {
+    color: rgb(196 181 253) !important; /* purple-300 */
+  }
+  
+  :root[data-theme="dark"] .text-purple-500 {
+    color: rgb(196 181 253) !important; /* purple-300 */
+  }
+  
+  :root[data-theme="dark"] .bg-purple-100 {
+    background-color: rgb(88 28 135) !important; /* purple-900 */
+  }
+  
+  :root[data-theme="dark"] .bg-purple-600 {
+    background-color: rgb(147 51 234) !important; /* purple-500 */
+  }
+  
+  :root[data-theme="dark"] .bg-purple-700 {
+    background-color: rgb(126 34 206) !important; /* purple-600 */
+  }
+  
+  :root[data-theme="dark"] .from-purple-100 {
+    --tw-gradient-from: rgb(88 28 135) !important; /* purple-900 */
+    --tw-gradient-to: rgb(88 28 135 / 0) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+  }
+  
+  /* Admin page specific colors */
+  :root[data-theme="dark"] .border-accent {
+    border-color: rgb(14 165 233) !important; /* apple-blue-500 */
+  }
+  
+  :root[data-theme="dark"] .text-accent {
+    color: rgb(14 165 233) !important; /* apple-blue-500 */
+  }
+  
+  :root[data-theme="dark"] .hover\:text-accent:hover {
+    color: rgb(14 165 233) !important; /* apple-blue-500 */
+  }
+  
+  /* Additional slate colors that might be used */
+  :root[data-theme="dark"] .text-slate-400 {
+    color: rgb(148 163 184) !important; /* apple-gray-400 */
+  }
+  
+  /* Background with opacity */
+  :root[data-theme="dark"] .bg-white\/80 {
+    background-color: rgb(30 41 59 / 0.8) !important; /* apple-gray-800 with opacity */
+  }
+  
+  /* Border with opacity */
+  :root[data-theme="dark"] .border-slate-200\/60 {
+    border-color: rgb(51 65 85 / 0.6) !important; /* apple-gray-700 with opacity */
+  }
+  
+  /* Use more general selectors for text colors */
+  
+  /* Background colors for admin and general pages - use stronger selectors */
+  :root[data-theme="dark"] .bg-slate-50 {
+    background-color: rgb(15 23 42) !important; /* apple-gray-900 */
+  }
+  
+  /* All white backgrounds become dark */
+  :root[data-theme="dark"] .bg-white {
+    background-color: rgb(30 41 59) !important; /* apple-gray-800 */
+  }
+  
+  /* Force admin pages to have dark background */
+  :root[data-theme="dark"] body {
+    background-color: rgb(15 23 42) !important; /* apple-gray-900 */
+  }
+  
+  /* Additional text colors for forms and admin */
+  :root[data-theme="dark"] .text-slate-700 {
+    color: rgb(203 213 225) !important; /* apple-gray-300 */
+  }
+  
+  :root[data-theme="dark"] .text-red-600 {
+    color: rgb(248 113 113) !important; /* red-400 for better contrast */
+  }
+  
+  :root[data-theme="dark"] .hover\:text-red-600:hover {
+    color: rgb(248 113 113) !important; /* red-400 */
+  }
+  
+  /* Legacy mappings - can be gradually replaced with semantic classes */
+  :root[data-theme="dark"] .bg-apple-gray-50 {
+    background-color: var(--color-bg-secondary) !important;
+  }
+  
+  :root[data-theme="dark"] .text-apple-gray-900 {
+    color: var(--color-text-primary) !important;
+  }
+  
+  :root[data-theme="dark"] .text-apple-gray-600 {
+    color: var(--color-text-secondary) !important;
+  }
+  
+  :root[data-theme="dark"] .border-apple-gray-200 {
+    border-color: var(--color-border-light) !important;
+  }
+  
+  /* Make sure ALL backgrounds are properly mapped */
+  :root[data-theme="dark"] div[class*="bg-white"],
+  :root[data-theme="dark"] div[class*="bg-slate"],
+  :root[data-theme="dark"] nav[class*="bg-white"],
+  :root[data-theme="dark"] [class*="bg-white"] {
+    background-color: rgb(30 41 59) !important; /* apple-gray-800 */
+  }
+  
+  :root[data-theme="dark"] div[class*="bg-slate-50"],
+  :root[data-theme="dark"] [class*="bg-slate-50"] {
+    background-color: rgb(15 23 42) !important; /* apple-gray-900 */
+  }
+  
+  /* Strongest possible selectors for admin pages */
+  :root[data-theme="dark"] body,
+  :root[data-theme="dark"] #auth-loading,
+  :root[data-theme="dark"] #admin-content {
+    background-color: rgb(15 23 42) !important; /* apple-gray-900 */
   }
 }

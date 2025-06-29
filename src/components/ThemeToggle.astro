@@ -1,0 +1,100 @@
+---
+// Theme toggle component for switching between light and dark modes
+---
+
+<button
+  id="theme-toggle"
+  class="btn btn-icon btn-ghost p-3 rounded-xl hover:bg-tertiary transition-all duration-300 touch-target"
+  aria-label="Toggle theme"
+  title="Toggle light/dark theme"
+>
+  <!-- Sun icon for light mode -->
+  <svg 
+    id="theme-toggle-light-icon" 
+    class="w-5 h-5 text-secondary" 
+    fill="currentColor" 
+    viewBox="0 0 20 20"
+  >
+    <path 
+      fill-rule="evenodd" 
+      d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" 
+      clip-rule="evenodd"
+    />
+  </svg>
+  
+  <!-- Moon icon for dark mode -->
+  <svg 
+    id="theme-toggle-dark-icon" 
+    class="w-5 h-5 text-secondary hidden" 
+    fill="currentColor" 
+    viewBox="0 0 20 20"
+  >
+    <path 
+      d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+    />
+  </svg>
+</button>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const themeToggle = document.getElementById('theme-toggle');
+    const lightIcon = document.getElementById('theme-toggle-light-icon');
+    const darkIcon = document.getElementById('theme-toggle-dark-icon');
+    
+    if (!themeToggle || !lightIcon || !darkIcon) return;
+    
+    // Function to update icon visibility
+    const updateIconVisibility = () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      if (currentTheme === 'dark') {
+        lightIcon.classList.add('hidden');
+        darkIcon.classList.remove('hidden');
+      } else {
+        lightIcon.classList.remove('hidden');
+        darkIcon.classList.add('hidden');
+      }
+    };
+    
+    // Initial icon update
+    updateIconVisibility();
+    
+    // Toggle theme function
+    const toggleTheme = () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      // Use astro-themes custom event to set theme
+      document.dispatchEvent(new CustomEvent('set-theme', { 
+        detail: newTheme 
+      }));
+      
+      // Update icons immediately
+      setTimeout(updateIconVisibility, 50);
+    };
+    
+    // Listen for theme changes (from astro-themes or system)
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+          updateIconVisibility();
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+    
+    // Button click handler
+    themeToggle.addEventListener('click', toggleTheme);
+    
+    // Keyboard support
+    themeToggle.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleTheme();
+      }
+    });
+  });
+</script>

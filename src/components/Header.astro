@@ -1,5 +1,6 @@
 ---
 import HeaderLink from './HeaderLink.astro';
+import ThemeToggle from './ThemeToggle.astro';
 import { SITE_TITLE } from '../consts';
 
 interface Props {
@@ -9,11 +10,11 @@ interface Props {
 const { siteTitle = SITE_TITLE } = Astro.props;
 ---
 
-<header class="glass border-b border-apple-gray-200/30 sticky top-0 z-50">
+<header class="bg-surface border-b border-surface sticky top-0 z-50">
 	<nav class="container-responsive py-4">
 		<div class="flex items-center justify-between">
 			<!-- Logo -->
-			<a href="/" class="text-2xl font-bold text-apple-gray-900 hover:text-apple-blue-500 transition-all duration-300 tracking-tight">
+			<a href="/" class="text-2xl font-bold text-primary hover:text-accent transition-all duration-300 tracking-tight">
 				{siteTitle}
 			</a>
 
@@ -22,18 +23,22 @@ const { siteTitle = SITE_TITLE } = Astro.props;
 				<HeaderLink href="/">Home</HeaderLink>
 				<HeaderLink href="/posts">Posts</HeaderLink>
 				<HeaderLink href="/tags">Tags</HeaderLink>
+				<ThemeToggle />
 			</div>
 
-			<!-- Mobile Menu Button -->
-			<button 
-				id="mobile-menu-button"
-				class="md:hidden p-3 rounded-xl hover:bg-apple-gray-100 transition-all duration-300 touch-target"
-				aria-label="Toggle menu"
-			>
-				<svg class="w-6 h-6 text-apple-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
-				</svg>
-			</button>
+			<!-- Mobile Menu Button and Theme Toggle -->
+			<div class="md:hidden flex items-center space-x-2">
+				<ThemeToggle />
+				<button 
+					id="mobile-menu-button"
+					class="p-3 rounded-xl hover:bg-tertiary transition-all duration-300 touch-target"
+					aria-label="Toggle menu"
+				>
+					<svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+					</svg>
+				</button>
+			</div>
 		</div>
 
 		<!-- Mobile Navigation -->
