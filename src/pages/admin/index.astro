@@ -1,0 +1,357 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import { SITE_TITLE } from '../../consts';
+
+const pageTitle = "Admin Dashboard";
+
+// This page requires client-side authentication, temporarily using static rendering
+// In actual use, authentication will be performed on the client side
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`${pageTitle} | ${SITE_TITLE}`} description="Blog admin dashboard" />
+	</head>
+	<body>
+		<!-- Authentication check loading -->
+		<div id="auth-loading" class="min-h-screen bg-apple-gray-50 flex items-center justify-center">
+			<div class="text-center">
+				<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-apple-blue-500 mx-auto mb-4"></div>
+				<p class="text-apple-gray-600">Checking login status...</p>
+			</div>
+		</div>
+
+		<!-- Main interface -->
+		<div id="admin-content" class="hidden min-h-screen bg-apple-gray-50">
+			<!-- Top navigation -->
+			<nav class="glass border-b border-apple-gray-200/30">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div class="flex justify-between h-16">
+						<div class="flex items-center">
+							<h1 class="text-xl font-semibold text-apple-gray-900">
+								{SITE_TITLE} - Admin Dashboard
+							</h1>
+						</div>
+						<div class="flex items-center space-x-4">
+							<a href="/" target="_blank" class="btn btn-ghost btn-sm">
+								View Site
+							</a>
+							<button id="logout-btn" class="btn btn-danger btn-sm">
+								Logout
+							</button>
+						</div>
+					</div>
+				</div>
+			</nav>
+
+			<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+				<!-- Statistics cards -->
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+					<div class="card p-6">
+						<div class="flex items-center">
+							<div class="flex-shrink-0">
+								<svg class="h-8 w-8 text-apple-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+								</svg>
+							</div>
+							<div class="ml-5 w-0 flex-1">
+								<dl>
+									<dt class="text-sm font-medium text-apple-gray-500 truncate">Total Posts</dt>
+									<dd class="text-lg font-semibold text-apple-gray-900" id="total-posts">-</dd>
+								</dl>
+							</div>
+						</div>
+					</div>
+
+					<div class="card p-6">
+						<div class="flex items-center">
+							<div class="flex-shrink-0">
+								<svg class="h-8 w-8 text-apple-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+								</svg>
+							</div>
+							<div class="ml-5 w-0 flex-1">
+								<dl>
+									<dt class="text-sm font-medium text-apple-gray-500 truncate">Articles</dt>
+									<dd class="text-lg font-semibold text-apple-gray-900" id="articles-count">-</dd>
+								</dl>
+							</div>
+						</div>
+					</div>
+
+					<div class="card p-6">
+						<div class="flex items-center">
+							<div class="flex-shrink-0">
+								<svg class="h-8 w-8 text-apple-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+								</svg>
+							</div>
+							<div class="ml-5 w-0 flex-1">
+								<dl>
+									<dt class="text-sm font-medium text-apple-gray-500 truncate">Notes</dt>
+									<dd class="text-lg font-semibold text-apple-gray-900" id="short-posts">-</dd>
+								</dl>
+							</div>
+						</div>
+					</div>
+
+					<div class="card p-6">
+						<div class="flex items-center">
+							<div class="flex-shrink-0">
+								<svg class="h-8 w-8 text-apple-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+								</svg>
+							</div>
+							<div class="ml-5 w-0 flex-1">
+								<dl>
+									<dt class="text-sm font-medium text-apple-gray-500 truncate">Tags</dt>
+									<dd class="text-lg font-semibold text-apple-gray-900" id="total-tags">-</dd>
+								</dl>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Quick actions -->
+				<div class="card p-8 mb-8">
+					<h2 class="text-lg font-semibold text-apple-gray-900 mb-6">Quick Actions</h2>
+					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+						<a href="/admin/articles/new" class="btn btn-primary flex-col py-4 px-6">
+							<svg class="h-5 w-5 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+							</svg>
+							<span class="text-sm font-medium">New Article</span>
+						</a>
+						<a href="/admin/notes/new" class="btn btn-secondary flex-col py-4 px-6">
+							<svg class="h-5 w-5 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+							</svg>
+							<span class="text-sm font-medium">New Note</span>
+						</a>
+						<a href="/admin/tags" class="btn btn-secondary flex-col py-4 px-6">
+							<svg class="h-5 w-5 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+							</svg>
+							<span class="text-sm font-medium">Tags</span>
+						</a>
+						<a href="/admin/import-export" class="btn btn-secondary flex-col py-4 px-6">
+							<svg class="h-5 w-5 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+							</svg>
+							<span class="text-sm font-medium">Import/Export</span>
+						</a>
+						<a href="/admin/site-config" class="btn btn-secondary flex-col py-4 px-6">
+							<svg class="h-5 w-5 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+							</svg>
+							<span class="text-sm font-medium">Settings</span>
+						</a>
+						<a href="/" target="_blank" class="btn btn-ghost flex-col py-4 px-6">
+							<svg class="h-5 w-5 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+							</svg>
+							<span class="text-sm font-medium">View Site</span>
+						</a>
+					</div>
+				</div>
+
+				<!-- Recent posts -->
+				<div class="card">
+					<div class="px-8 py-6 border-b border-apple-gray-200">
+						<h2 class="text-lg font-semibold text-apple-gray-900">Recent Posts</h2>
+					</div>
+					<div class="p-8">
+						<div id="recent-posts" class="space-y-4">
+							<div class="animate-pulse">
+								<div class="h-4 bg-apple-gray-200 rounded w-3/4 mb-2"></div>
+								<div class="h-3 bg-apple-gray-200 rounded w-1/2"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			document.addEventListener('DOMContentLoaded', async () => {
+				const authLoading = document.getElementById('auth-loading');
+				const adminContent = document.getElementById('admin-content');
+				const logoutBtn = document.getElementById('logout-btn');
+
+				// Check authentication status
+				const token = localStorage.getItem('admin_token');
+				const expires = localStorage.getItem('admin_token_expires');
+
+				if (!token || !expires || new Date(expires) < new Date()) {
+					// Not logged in or token expired, redirect to login page
+					localStorage.removeItem('admin_token');
+					localStorage.removeItem('admin_token_expires');
+					window.location.href = '/admin/login';
+					return;
+				}
+
+				// Show admin interface
+				authLoading?.classList.add('hidden');
+				adminContent?.classList.remove('hidden');
+
+				// Wait a bit for DOM to be ready, then load statistics data
+				setTimeout(async () => {
+					await loadStats();
+					await loadRecentPosts();
+				}, 100);
+
+				// Logout
+				logoutBtn?.addEventListener('click', () => {
+					localStorage.removeItem('admin_token');
+					localStorage.removeItem('admin_token_expires');
+					window.location.href = '/admin/login';
+				});
+			});
+
+			async function loadStats() {
+				try {
+					const response = await fetch('/api/stats');
+					
+					if (!response.ok) {
+						return;
+					}
+					
+					const result = await response.json() as {
+						success: boolean;
+						data?: any;
+						error?: string;
+					};
+					
+					if (result.success && result.data) {
+						const stats = result.data;
+						
+						// Set with fallback values and element existence check
+						const totalPostsEl = document.getElementById('total-posts');
+						const articlesCountEl = document.getElementById('articles-count');
+						const shortPostsEl = document.getElementById('short-posts');
+						const totalTagsEl = document.getElementById('total-tags');
+						
+						if (totalPostsEl) totalPostsEl.textContent = stats.total_posts?.toString() || '0';
+						if (articlesCountEl) articlesCountEl.textContent = stats.total_articles?.toString() || '0';
+						if (shortPostsEl) shortPostsEl.textContent = stats.short_posts?.toString() || '0';
+						if (totalTagsEl) totalTagsEl.textContent = stats.total_tags?.toString() || '0';
+					} else {
+						// Set error indicators
+						document.getElementById('total-posts')!.textContent = '-';
+						document.getElementById('articles-count')!.textContent = '-';
+						document.getElementById('short-posts')!.textContent = '-';
+						document.getElementById('total-tags')!.textContent = '-';
+					}
+				} catch (error) {
+					// Set error indicators
+					document.getElementById('total-posts')!.textContent = '-';
+					document.getElementById('articles-count')!.textContent = '-';
+					document.getElementById('short-posts')!.textContent = '-';
+					document.getElementById('total-tags')!.textContent = '-';
+				}
+			}
+
+			async function loadRecentPosts() {
+				try {
+					const response = await fetch('/api/posts?limit=10&status=all');
+					
+					if (!response.ok) {
+						return;
+					}
+					
+					const result = await response.json() as {
+						success: boolean;
+						data?: any[];
+						pagination?: any;
+						error?: string;
+					};
+					
+					if (result.success && result.data) {
+						const recentPosts = document.getElementById('recent-posts');
+						if (recentPosts) {
+							if (result.data.length === 0) {
+								recentPosts.innerHTML = `
+									<div class="text-center py-8 text-apple-gray-500">
+										<p>No posts found. <a href="/admin/articles/new" class="text-apple-blue-500 hover:underline">Create your first post</a></p>
+									</div>
+								`;
+							} else {
+								recentPosts.innerHTML = result.data.map((post: any) => {
+									// For notes, extract content preview (first 80 characters)
+									const getDisplayTitle = () => {
+										if (post.type === 'article') {
+											return post.title || '(No Title)';
+										} else {
+											// For notes, show content preview
+											const content = post.content || '';
+											const preview = content.replace(/[#*`\n]/g, '').trim(); // Remove markdown formatting
+											return preview.length > 80 ? preview.substring(0, 80) + '...' : preview || '(Empty note)';
+										}
+									};
+									
+									return `
+										<div class="flex items-center justify-between p-4 card mb-3">
+											<div class="flex-1">
+												<h3 class="font-semibold text-apple-gray-900 ${post.type === 'note' ? 'line-clamp-2' : ''}">
+													${getDisplayTitle()}
+												</h3>
+												<p class="text-sm text-apple-gray-500">
+													${post.type === 'article' ? '📄 Article' : '💬 Note'} • 
+													${new Date(post.created_at).toLocaleDateString('en-US')}
+												</p>
+											</div>
+											<div class="flex items-center space-x-3">
+												<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+													post.status === 'published' 
+														? 'bg-apple-green/10 text-apple-green border border-apple-green/20' 
+														: 'bg-apple-orange/10 text-apple-orange border border-apple-orange/20'
+												}">
+													${post.status === 'published' ? 'Published' : 'Draft'}
+												</span>
+												<a href="/admin/${post.type === 'article' ? 'articles' : 'notes'}/${post.id}" class="btn btn-ghost btn-sm">
+													Edit
+												</a>
+											</div>
+										</div>
+									`;
+								}).join('');
+								
+								// Show pagination info if available
+								if (result.pagination) {
+									const paginationInfo = document.createElement('div');
+									paginationInfo.className = 'mt-4 text-sm text-apple-gray-500 text-center';
+									paginationInfo.innerHTML = `
+										Showing ${result.data.length} of ${result.pagination.total} posts
+										${result.pagination.total > 10 ? ' • <a href="/admin/posts" class="text-apple-blue-500 hover:underline">View all posts</a>' : ''}
+									`;
+									recentPosts.appendChild(paginationInfo);
+								}
+							}
+						}
+					} else {
+						const recentPosts = document.getElementById('recent-posts');
+						if (recentPosts) {
+							recentPosts.innerHTML = `
+								<div class="text-center py-8 text-apple-red">
+									<p>Failed to load recent posts</p>
+								</div>
+							`;
+						}
+					}
+				} catch (error) {
+					const recentPosts = document.getElementById('recent-posts');
+					if (recentPosts) {
+						recentPosts.innerHTML = `
+							<div class="text-center py-8 text-apple-red">
+								<p>Error loading posts</p>
+							</div>
+						`;
+					}
+				}
+			}
+		</script>
+	</body>
+</html>

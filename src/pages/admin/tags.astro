@@ -1,0 +1,365 @@
+---
+import AdminLayout from '../../components/AdminLayout.astro';
+---
+
+<AdminLayout title="Manage Tags">
+  <div class="space-y-6">
+    <!-- Page Header -->
+    <div class="bg-white shadow-sm rounded-lg px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900">Manage Tags</h1>
+          <p class="mt-1 text-sm text-slate-500">
+            Add, edit, or remove tags used to categorize your content.
+          </p>
+        </div>
+        <a href="/admin" class="btn-secondary">
+          Back to Dashboard
+        </a>
+      </div>
+    </div>
+
+    <!-- Message Container -->
+    <div id="message-container" class="hidden">
+      <!-- Messages will be dynamically inserted here -->
+    </div>
+
+    <!-- Add New Tag -->
+    <div class="bg-white shadow-sm rounded-lg p-6">
+      <h2 class="text-lg font-medium text-slate-900 mb-4">Add New Tag</h2>
+      <form id="add-tag-form" class="flex items-end space-x-4">
+        <div class="flex-1">
+          <label for="tag-name" class="block text-sm font-medium text-slate-700 mb-2">
+            Tag Name
+          </label>
+          <input
+            type="text"
+            id="tag-name"
+            name="name"
+            required
+            maxlength="20"
+            class="block w-full border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-accent focus:border-accent text-base py-3 px-4"
+            placeholder="Enter tag name (max 20 characters)"
+          />
+        </div>
+        <button
+          type="submit"
+          class="btn-primary py-3 px-6"
+        >
+          Add Tag
+        </button>
+      </form>
+    </div>
+
+    <!-- Tags List -->
+    <div class="bg-white shadow-sm rounded-lg">
+      <div class="px-6 py-4 border-b border-slate-200">
+        <h2 class="text-lg font-medium text-slate-900">Existing Tags</h2>
+      </div>
+      <div class="p-6">
+        <div id="tags-loading" class="text-center py-8">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-accent mx-auto mb-4"></div>
+          <p class="text-slate-600">Loading tags...</p>
+        </div>
+        
+        <div id="tags-list" class="hidden">
+          <div id="tags-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <!-- Tags will be dynamically inserted here -->
+          </div>
+          
+          <div id="empty-state" class="hidden text-center py-8">
+            <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-slate-900">No tags yet</h3>
+            <p class="mt-1 text-sm text-slate-500">Get started by creating your first tag.</p>
+          </div>
+        </div>
+
+        <div id="error-state" class="hidden text-center py-8">
+          <div class="text-red-400 mb-4">
+            <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-slate-900">Failed to load tags</h3>
+          <p class="mt-1 text-slate-600">There was an error loading the tags.</p>
+          <button id="retry-btn" class="mt-4 btn-primary">
+            Retry
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="hidden fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div class="mt-3 text-center">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+          <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-slate-900 mt-4">Delete Tag</h3>
+        <div class="mt-2 px-7 py-3">
+          <p class="text-sm text-slate-500">
+            Are you sure you want to delete the tag "<span id="delete-tag-name" class="font-medium"></span>"? 
+            This action cannot be undone.
+          </p>
+        </div>
+        <div class="flex justify-center space-x-4 mt-4">
+          <button id="cancel-delete" class="btn-secondary">
+            Cancel
+          </button>
+          <button id="confirm-delete" class="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-md transition-colors">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  // Add type declarations
+  declare global {
+    interface Window {
+      authFetch: (url: string, options?: any) => Promise<Response>;
+      showDeleteModal: (tagName: string) => void;
+    }
+  }
+
+  interface Tag {
+    id: number;
+    name: string;
+    slug: string;
+    description: string | null;
+    created_at: string;
+    post_count: number;
+  }
+
+  interface ApiResponse<T = any> {
+    success: boolean;
+    data?: T;
+    error?: string;
+    message?: string;
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const addTagForm = document.getElementById('add-tag-form') as HTMLFormElement | null;
+    const tagNameInput = document.getElementById('tag-name') as HTMLInputElement | null;
+    const messageContainer = document.getElementById('message-container') as HTMLDivElement | null;
+    const tagsLoading = document.getElementById('tags-loading') as HTMLDivElement | null;
+    const tagsList = document.getElementById('tags-list') as HTMLDivElement | null;
+    const tagsGrid = document.getElementById('tags-grid') as HTMLDivElement | null;
+    const emptyState = document.getElementById('empty-state') as HTMLDivElement | null;
+    const errorState = document.getElementById('error-state') as HTMLDivElement | null;
+    const retryBtn = document.getElementById('retry-btn') as HTMLButtonElement | null;
+    const deleteModal = document.getElementById('delete-modal') as HTMLDivElement | null;
+    const deleteTagName = document.getElementById('delete-tag-name') as HTMLSpanElement | null;
+    const cancelDelete = document.getElementById('cancel-delete') as HTMLButtonElement | null;
+    const confirmDelete = document.getElementById('confirm-delete') as HTMLButtonElement | null;
+
+    let tags: Tag[] = [];
+    let tagToDelete: string | null = null;
+
+    // Load tags on page load
+    await loadTags();
+
+    // Add tag form submission
+    addTagForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await addTag();
+    });
+
+    // Retry button
+    retryBtn?.addEventListener('click', () => {
+      loadTags();
+    });
+
+    // Modal handlers
+    cancelDelete?.addEventListener('click', () => {
+      closeDeleteModal();
+    });
+
+    confirmDelete?.addEventListener('click', async () => {
+      if (tagToDelete) {
+        await deleteTag(tagToDelete);
+      }
+    });
+
+    // Close modal when clicking outside
+    deleteModal?.addEventListener('click', (e) => {
+      if (e.target === deleteModal) {
+        closeDeleteModal();
+      }
+    });
+
+    async function loadTags() {
+      try {
+        tagsLoading?.classList.remove('hidden');
+        tagsList?.classList.add('hidden');
+        errorState?.classList.add('hidden');
+
+        const response = await window.authFetch('/api/tags');
+        const result = await response.json() as ApiResponse<Tag[]>;
+
+        if (result.success) {
+          tags = result.data || [];
+          renderTags();
+          
+          tagsLoading?.classList.add('hidden');
+          tagsList?.classList.remove('hidden');
+        } else {
+          throw new Error(result.error || 'Failed to load tags');
+        }
+      } catch (error) {
+        console.error('Failed to load tags:', error);
+        
+        tagsLoading?.classList.add('hidden');
+        errorState?.classList.remove('hidden');
+      }
+    }
+
+    function renderTags() {
+      if (!tagsGrid) return;
+
+      if (tags.length === 0) {
+        tagsGrid.classList.add('hidden');
+        emptyState?.classList.remove('hidden');
+        return;
+      }
+
+      emptyState?.classList.add('hidden');
+      tagsGrid.classList.remove('hidden');
+
+      tagsGrid.innerHTML = tags.map(tag => `
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 hover:border-slate-300 transition-colors">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <h3 class="font-medium text-slate-900">${tag.name}</h3>
+              <p class="text-sm text-slate-500 mt-1">
+                ${tag.post_count || 0} ${tag.post_count === 1 ? 'post' : 'posts'}
+              </p>
+            </div>
+            <button 
+              onclick="showDeleteModal('${tag.name}')"
+              class="text-red-600 hover:text-red-800 transition-colors p-1"
+              title="Delete tag"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function addTag() {
+      if (!tagNameInput) return;
+
+      const tagName = tagNameInput.value.trim();
+      if (!tagName) {
+        showMessage('Please enter a tag name', 'error');
+        return;
+      }
+
+      // Check if tag already exists
+      if (tags.some(tag => tag.name.toLowerCase() === tagName.toLowerCase())) {
+        showMessage('This tag already exists', 'error');
+        return;
+      }
+
+      try {
+        const response = await window.authFetch('/api/tags', {
+          method: 'POST',
+          body: JSON.stringify({ name: tagName })
+        });
+
+        const result = await response.json() as ApiResponse<Tag>;
+
+        if (result.success) {
+          showMessage('Tag added successfully!', 'success');
+          tagNameInput.value = '';
+          await loadTags(); // Reload tags list
+        } else {
+          showMessage(result.error || 'Failed to add tag', 'error');
+        }
+      } catch (error) {
+        console.error('Failed to add tag:', error);
+        showMessage('Network error, please try again', 'error');
+      }
+    }
+
+    window.showDeleteModal = function(tagName: string) {
+      tagToDelete = tagName;
+      if (deleteTagName) {
+        deleteTagName.textContent = tagName;
+      }
+      deleteModal?.classList.remove('hidden');
+    };
+
+    function closeDeleteModal() {
+      deleteModal?.classList.add('hidden');
+      tagToDelete = null;
+    }
+
+    async function deleteTag(tagName: string) {
+      try {
+        const response = await window.authFetch('/api/tags', {
+          method: 'DELETE',
+          body: JSON.stringify({ name: tagName })
+        });
+
+        const result = await response.json() as ApiResponse;
+
+        if (result.success) {
+          showMessage('Tag deleted successfully!', 'success');
+          closeDeleteModal();
+          await loadTags(); // Reload tags list
+        } else {
+          showMessage(result.error || 'Failed to delete tag', 'error');
+        }
+      } catch (error) {
+        console.error('Failed to delete tag:', error);
+        showMessage('Network error, please try again', 'error');
+      }
+    }
+
+    function showMessage(message: string, type: 'success' | 'error') {
+      if (!messageContainer) return;
+
+      const bgColor = type === 'success' ? 'bg-green-50' : 'bg-red-50';
+      const textColor = type === 'success' ? 'text-green-800' : 'text-red-800';
+      const borderColor = type === 'success' ? 'border-green-200' : 'border-red-200';
+      const iconSvg = type === 'success' 
+        ? `<svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+           </svg>`
+        : `<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+           </svg>`;
+      
+      messageContainer.innerHTML = `
+        <div class="rounded-md ${bgColor} border ${borderColor} p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              ${iconSvg}
+            </div>
+            <div class="ml-3">
+              <p class="${textColor} text-sm font-medium">${message}</p>
+            </div>
+          </div>
+        </div>
+      `;
+      messageContainer.classList.remove('hidden');
+      
+      // Auto-hide messages
+      setTimeout(() => {
+        messageContainer.classList.add('hidden');
+      }, 5000);
+    }
+  });
+</script> 

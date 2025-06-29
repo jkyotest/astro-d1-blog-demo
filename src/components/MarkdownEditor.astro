@@ -1,0 +1,268 @@
+---
+interface Props {
+	id: string;
+	name: string;
+	placeholder?: string;
+	required?: boolean;
+	initialValue?: string;
+	class?: string;
+}
+
+const { id, name, placeholder = "Start typing your content...", required = false, initialValue = "", class: className = "" } = Astro.props;
+---
+
+<div class={`markdown-editor ${className}`}>
+	<textarea 
+		{id} 
+		{name} 
+		class="easymde-textarea"
+		placeholder={placeholder}
+		data-required={required}
+		>{initialValue}</textarea>
+</div>
+
+<style>
+	.markdown-editor :global(.EasyMDEContainer) {
+		@apply border border-slate-300 rounded-md;
+	}
+	
+	.markdown-editor :global(.EasyMDEContainer.easymde-focused) {
+		@apply ring-2 ring-accent ring-opacity-50 border-accent;
+	}
+	
+	.markdown-editor :global(.editor-toolbar) {
+		@apply border-b border-slate-200 bg-slate-50;
+	}
+	
+	.markdown-editor :global(.editor-toolbar button) {
+		@apply text-slate-600 hover:text-accent hover:bg-accent/10;
+		@apply transition-all duration-200;
+	}
+	
+	.markdown-editor :global(.editor-toolbar button i) {
+		@apply text-slate-600;
+	}
+	
+	.markdown-editor :global(.editor-toolbar button:hover i) {
+		@apply text-accent;
+	}
+	
+	.markdown-editor :global(.editor-toolbar button.active i) {
+		@apply text-accent;
+	}
+	
+	/* Ensure Font Awesome icons display correctly */
+	.markdown-editor :global(.editor-toolbar .fa) {
+		@apply text-slate-600;
+	}
+	
+	.markdown-editor :global(.editor-toolbar button:hover .fa) {
+		@apply text-accent;
+	}
+	
+	.markdown-editor :global(.editor-toolbar button.active .fa) {
+		@apply text-accent;
+	}
+	
+	.markdown-editor :global(.editor-toolbar button.active) {
+		@apply text-accent bg-accent/10;
+	}
+	
+	.markdown-editor :global(.editor-toolbar i.separator) {
+		@apply border-l border-slate-300;
+	}
+	
+	.markdown-editor :global(.CodeMirror) {
+		@apply border-0 text-sm font-mono;
+		min-height: 400px;
+	}
+	
+	.markdown-editor :global(.CodeMirror-focused) {
+		@apply outline-none;
+	}
+	
+	.markdown-editor :global(.CodeMirror-scroll) {
+		@apply p-4;
+	}
+	
+	.markdown-editor :global(.editor-preview) {
+		@apply bg-slate-50 prose prose-slate max-w-none p-4;
+		min-height: 400px;
+	}
+	
+	.markdown-editor :global(.editor-preview-side) {
+		@apply bg-slate-50 prose prose-slate max-w-none p-4;
+		min-height: 400px;
+	}
+	
+	/* Custom Markdown preview styles */
+	.markdown-editor :global(.editor-preview h1) {
+		@apply text-2xl font-bold mt-8 mb-4;
+	}
+	
+	.markdown-editor :global(.editor-preview h2) {
+		@apply text-xl font-bold mt-6 mb-3;
+	}
+	
+	.markdown-editor :global(.editor-preview h3) {
+		@apply text-lg font-bold mt-4 mb-2;
+	}
+	
+	.markdown-editor :global(.editor-preview p) {
+		@apply mb-4;
+	}
+	
+	.markdown-editor :global(.editor-preview ul) {
+		@apply list-disc list-inside space-y-1 mb-4;
+	}
+	
+	.markdown-editor :global(.editor-preview ol) {
+		@apply list-decimal list-inside space-y-1 mb-4;
+	}
+	
+	.markdown-editor :global(.editor-preview code) {
+		@apply bg-slate-100 text-red-600 px-1 rounded text-sm;
+	}
+	
+	.markdown-editor :global(.editor-preview pre) {
+		@apply bg-slate-100 p-4 rounded-md overflow-x-auto mb-4;
+	}
+	
+	.markdown-editor :global(.editor-preview blockquote) {
+		@apply border-l-4 border-slate-300 pl-4 italic text-slate-600 mb-4;
+	}
+	
+	.markdown-editor :global(.editor-preview a) {
+		@apply text-blue-600 underline hover:text-blue-800;
+	}
+	
+	.markdown-editor :global(.editor-preview img) {
+		@apply max-w-full h-auto rounded-md;
+	}
+	
+	.markdown-editor :global(.editor-preview table) {
+		@apply w-full border-collapse border border-slate-300 mb-4;
+	}
+	
+	.markdown-editor :global(.editor-preview th),
+	.markdown-editor :global(.editor-preview td) {
+		@apply border border-slate-300 px-3 py-2;
+	}
+	
+	.markdown-editor :global(.editor-preview th) {
+		@apply bg-slate-100 font-bold;
+	}
+</style>
+
+<script>
+	import EasyMDE from 'easymde';
+	import 'easymde/dist/easymde.min.css';
+
+	declare global {
+		interface Window {
+			initMarkdownEditor: (id: string, initialValue?: string) => EasyMDE | null;
+		}
+	}
+
+	// Initialize EasyMDE editor
+	window.initMarkdownEditor = function(id: string, initialValue: string = ''): EasyMDE | null {
+		const textarea = document.getElementById(id) as HTMLTextAreaElement;
+		
+		if (!textarea) {
+			console.error(`Textarea with id "${id}" not found`);
+			return null;
+		}
+
+		// Set initial value if provided
+		if (initialValue) {
+			textarea.value = initialValue;
+		}
+
+		const easyMDE = new EasyMDE({
+			element: textarea,
+			placeholder: textarea.placeholder || 'Start typing your content... Supports Markdown syntax',
+			spellChecker: false,
+			status: ['autosave', 'lines', 'words', 'cursor'],
+			autofocus: false,
+			tabSize: 4,
+			indentWithTabs: false,
+			lineWrapping: true,
+			autoDownloadFontAwesome: true,
+			toolbar: [
+				'bold', 'italic', 'strikethrough', '|',
+				'heading-1', 'heading-2', 'heading-3', '|',
+				'quote', 'unordered-list', 'ordered-list', '|',
+				'link', 'image', 'code', 'table', '|',
+				'preview', 'side-by-side', 'fullscreen', '|',
+				'guide'
+			],
+			shortcuts: {
+				toggleBold: 'Cmd-B',
+				toggleItalic: 'Cmd-I',
+				toggleStrikethrough: 'Cmd-Alt-S',
+				toggleHeadingSmaller: 'Cmd-H',
+				toggleHeadingBigger: 'Cmd-Shift-H',
+				toggleUnorderedList: 'Cmd-L',
+				toggleOrderedList: 'Cmd-Alt-L',
+				toggleCodeBlock: 'Cmd-Alt-C',
+				togglePreview: 'Cmd-P',
+				toggleSideBySide: 'F9',
+				toggleFullScreen: 'F11'
+			},
+			renderingConfig: {
+				singleLineBreaks: false,
+				codeSyntaxHighlighting: true,
+			},
+			insertTexts: {
+				horizontalRule: ['', '\n\n-----\n\n'],
+				image: ['![](http://', ')'],
+				link: ['[', '](http://)'],
+				table: ['', '\n\n| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text     | Text     |\n\n'],
+			},
+			parsingConfig: {
+				allowAtxHeaderWithoutSpace: true,
+				strikethrough: true,
+				underscoresBreakWords: true,
+			},
+			previewClass: ['editor-preview', 'prose', 'prose-slate', 'max-w-none'],
+		});
+
+		// Add custom style classes
+		// Use setTimeout to ensure EasyMDE is fully initialized before adding styles
+		setTimeout(() => {
+			const container = textarea.closest('.markdown-editor')?.querySelector('.editor-container') || 
+							  textarea.parentElement?.querySelector('.editor-container');
+			if (container) {
+				container.classList.add('EasyMDEContainer');
+			}
+		}, 100);
+
+		// Listen for focus events
+		easyMDE.codemirror.on('focus', () => {
+			const container = textarea.closest('.markdown-editor')?.querySelector('.editor-container');
+			if (container) {
+				container.classList.add('easymde-focused');
+			}
+		});
+
+		easyMDE.codemirror.on('blur', () => {
+			const container = textarea.closest('.markdown-editor')?.querySelector('.editor-container');
+			if (container) {
+				container.classList.remove('easymde-focused');
+			}
+		});
+
+		// Listen for content changes, sync to original textarea and trigger form validation
+		easyMDE.codemirror.on('change', () => {
+			// Sync content to original textarea
+			const content = easyMDE.value();
+			textarea.value = content;
+			
+			// Trigger change and input events to ensure form validation works properly
+			textarea.dispatchEvent(new Event('change', { bubbles: true }));
+			textarea.dispatchEvent(new Event('input', { bubbles: true }));
+		});
+
+		return easyMDE;
+	};
+</script> 

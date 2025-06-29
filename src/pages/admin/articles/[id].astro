@@ -1,0 +1,21 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import PostEditor from '../../../components/PostEditor.astro';
+
+// Get article ID from URL params
+const { id } = Astro.params;
+
+if (!id) {
+	return Astro.redirect('/admin');
+}
+
+export const prerender = false;
+---
+
+<AdminLayout title="Edit Article">
+	<PostEditor 
+		postType="article" 
+		postId={id}
+		backUrl="/admin"
+	/>
+</AdminLayout> 

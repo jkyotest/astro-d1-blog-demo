@@ -1,0 +1,988 @@
+---
+import MarkdownEditor from './MarkdownEditor.astro';
+
+interface Props {
+  postType: 'article' | 'note';
+  postId?: string;
+  title?: string;
+  backUrl?: string;
+}
+
+const { 
+  postType, 
+  postId = '',
+  title = postType === 'article' ? 'New Article' : 'New Note',
+  backUrl = '/admin'
+} = Astro.props;
+
+const isEdit = !!postId;
+const pageTitle = isEdit ? `Edit ${postType === 'article' ? 'Article' : 'Note'}` : title;
+---
+
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="card px-8 py-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-apple-gray-900">{pageTitle}</h1>
+        <p class="mt-1 text-sm text-apple-gray-500">
+          {postType === 'article' 
+            ? isEdit 
+              ? 'Edit existing long-form article with Markdown support.'
+              : 'Create a new long-form article with Markdown support.'
+            : isEdit
+              ? 'Edit existing note with Markdown support.'
+              : 'Quickly publish a note with Markdown support.'
+          }
+        </p>
+      </div>
+      <div class="flex items-center space-x-3">
+        <!-- Auto-save Status -->
+        <div id="auto-save-status" class="hidden items-center text-sm text-apple-gray-500">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <span>Saved</span>
+        </div>
+        <a href={backUrl} class="btn btn-secondary">
+          Back to List
+        </a>
+        {isEdit && (
+          <button
+            type="button"
+            id="delete-btn"
+            class="btn btn-danger"
+          >
+            Delete {postType === 'article' ? 'Article' : 'Note'}
+          </button>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Container - Moved to Top -->
+  <div id="message-container" class="hidden">
+    <!-- Messages will be dynamically inserted here -->
+  </div>
+
+  <!-- Loading State -->
+  <div id="loading-state" class="card p-8" class:list={[{ 'hidden': !isEdit }]}>
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-apple-blue-500 mx-auto"></div>
+      <p class="mt-2 text-apple-gray-600">Loading {postType}...</p>
+    </div>
+  </div>
+
+  <!-- Editor Form -->
+  <div id="editor-form-container" class="card" class:list={[{ 'hidden': isEdit }]}>
+    <form id="post-form" class="space-y-6 p-8">
+      {isEdit && <input type="hidden" id="post-id" name="id" value={postId} />}
+      
+      <!-- Enhanced Title Field (Articles only) -->
+      {postType === 'article' && (
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label for="title" class="flex items-center text-sm font-medium text-apple-gray-700">
+              <span>Article Title</span>
+              <span class="ml-1 text-apple-red" title="Required field">*</span>
+            </label>
+            <span id="title-count" class="text-xs text-apple-gray-400 font-mono">0/100</span>
+          </div>
+          <div class="relative">
+            <input
+              type="text"
+              id="title"
+              name="title"
+              required={postType === 'article'}
+              maxlength="100"
+              class="form-input"
+              placeholder="Enter article title, e.g., My First Blog Post"
+            />
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg class="w-4 h-4 text-apple-red opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              </svg>
+            </div>
+            <div id="title-error" class="hidden mt-2 p-3 bg-apple-red/10 border border-apple-red/20 rounded-lg">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 text-apple-red mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <span class="text-sm text-apple-red" id="title-error-text">Article title is required</span>
+              </div>
+            </div>
+          </div>
+          <p class="mt-2 text-xs text-apple-gray-500">
+            📝 A good title attracts readers and accurately describes the content
+          </p>
+        </div>
+      )}
+
+      <!-- Hidden title field for notes (for form compatibility) -->
+      {postType === 'note' && (
+        <input type="hidden" id="title" name="title" value="" />
+      )}
+
+      <!-- Language Selection (for articles only) -->
+      {postType === 'article' && (
+        <div>
+          <label class="block text-sm font-medium text-apple-gray-700 mb-3">
+            Title Language <span class="text-xs text-apple-gray-500">(for URL generation)</span>
+          </label>
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <label class="flex items-center p-3 border border-apple-gray-200 rounded-lg cursor-pointer hover:border-apple-blue-500 transition-colors">
+              <input
+                type="radio"
+                name="language"
+                value="auto"
+                checked
+                class="h-4 w-4 text-apple-blue-500 focus:ring-apple-blue-500 border-apple-gray-300"
+              />
+              <span class="ml-2 text-sm text-apple-gray-700">Auto-detect</span>
+            </label>
+            <label class="flex items-center p-3 border border-apple-gray-200 rounded-lg cursor-pointer hover:border-apple-blue-500 transition-colors">
+              <input
+                type="radio"
+                name="language"
+                value="Chinese"
+                class="h-4 w-4 text-apple-blue-500 focus:ring-apple-blue-500 border-apple-gray-300"
+              />
+              <span class="ml-2 text-sm text-apple-gray-700">Chinese</span>
+            </label>
+            <label class="flex items-center p-3 border border-apple-gray-200 rounded-lg cursor-pointer hover:border-apple-blue-500 transition-colors">
+              <input
+                type="radio"
+                name="language"
+                value="Japanese"
+                class="h-4 w-4 text-apple-blue-500 focus:ring-apple-blue-500 border-apple-gray-300"
+              />
+              <span class="ml-2 text-sm text-apple-gray-700">Japanese</span>
+            </label>
+            <label class="flex items-center p-3 border border-apple-gray-200 rounded-lg cursor-pointer hover:border-apple-blue-500 transition-colors">
+              <input
+                type="radio"
+                name="language"
+                value="english"
+                class="h-4 w-4 text-apple-blue-500 focus:ring-apple-blue-500 border-apple-gray-300"
+              />
+              <span class="ml-2 text-sm text-apple-gray-700">English</span>
+            </label>
+          </div>
+          <p class="mt-2 text-xs text-apple-gray-500">
+            💡 This helps generate the correct URL slug. Auto-detect works for most cases.
+          </p>
+        </div>
+      )}
+
+      <!-- Content Editor -->
+      <div>
+        <label for="content" class="flex items-center text-sm font-medium text-apple-gray-700 mb-3">
+          {postType === 'article' ? (
+            <>
+              <span>Article Content</span>
+              <span class="ml-1 text-apple-red" title="Required field">*</span>
+            </>
+          ) : (
+            <>
+              <span>Note Content</span>
+              <span class="ml-1 text-apple-red" title="Required field">*</span>
+            </>
+          )}
+        </label>
+        <MarkdownEditor 
+          id="content" 
+          name="content" 
+          required={true}
+          placeholder={postType === 'article' 
+            ? "Start writing your article content... Full Markdown syntax supported"
+            : "Record your thoughts... Markdown syntax supported"
+          }
+        />
+      </div>
+
+      <!-- Enhanced Tags Section -->
+      <div>
+        <label class="block text-sm font-medium text-apple-gray-700 mb-3">
+          Tags <span class="text-xs text-apple-gray-500">(Press Enter to add)</span>
+        </label>
+        
+        <!-- Selected tags -->
+        <div id="selected-tags" class="flex flex-wrap gap-2 mb-3 min-h-[3rem] p-3 border border-apple-gray-200 rounded-lg bg-apple-gray-50">
+          <!-- Selected tags will be displayed here -->
+        </div>
+        
+        <!-- Available tags -->
+        <div id="available-tags" class="flex flex-wrap gap-2 mb-3">
+          <!-- Available tags will be displayed here -->
+        </div>
+        
+        <!-- Tag input with character count -->
+        <div class="relative">
+          <div class="flex items-center space-x-2">
+            <div class="flex-1 relative">
+              <input
+                type="text"
+                id="tag-input"
+                placeholder="Add new tag (max 20 characters)"
+                class="form-input text-base py-3 px-4 pr-12"
+                maxlength="20"
+              />
+              <span id="tag-count" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-apple-gray-400">0/20</span>
+            </div>
+            <button
+              type="button"
+              id="add-tag-btn"
+              class="btn btn-secondary text-base py-3 px-6"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enhanced Publishing Options -->
+      <div class="space-y-4 pt-6 border-t border-apple-gray-200">
+        <div>
+          <label class="block text-sm font-medium text-apple-gray-700 mb-3">
+            Publishing Status
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- Draft Option -->
+            <label class="relative cursor-pointer">
+              <input
+                type="radio"
+                name="status"
+                value="draft"
+                class="sr-only peer"
+              />
+              <div class="p-4 border-2 border-apple-gray-200 rounded-lg peer-checked:border-apple-blue-500 peer-checked:bg-apple-blue-500/5 transition-all hover:border-apple-gray-300">
+                <div class="flex items-center space-x-3">
+                  <div class="flex-shrink-0">
+                    <svg class="w-5 h-5 text-apple-gray-400 peer-checked:text-apple-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <div class="text-sm font-medium text-apple-gray-900">Save as Draft</div>
+                    <div class="text-xs text-apple-gray-500">Keep working on it privately</div>
+                  </div>
+                </div>
+              </div>
+            </label>
+
+            <!-- Publish Option -->
+            <label class="relative cursor-pointer">
+              <input
+                type="radio"
+                name="status"
+                value="published"
+                checked={!isEdit}
+                class="sr-only peer"
+              />
+              <div class="p-4 border-2 border-apple-gray-200 rounded-lg peer-checked:border-apple-blue-500 peer-checked:bg-apple-blue-500/5 transition-all hover:border-apple-gray-300">
+                <div class="flex items-center space-x-3">
+                  <div class="flex-shrink-0">
+                    <svg class="w-5 h-5 text-apple-gray-400 peer-checked:text-apple-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <div class="text-sm font-medium text-apple-gray-900">Publish Now</div>
+                    <div class="text-xs text-apple-gray-500">Make it public immediately</div>
+                  </div>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3 text-sm text-apple-gray-500">
+            <span>💡 Pro tip: Use Ctrl+S to save quickly</span>
+          </div>
+          <div class="flex items-center space-x-3">
+            <a href={backUrl} class="btn btn-secondary">
+              Cancel
+            </a>
+            <button
+              type="button"
+              id="save-draft-btn"
+              class="btn btn-secondary hidden"
+            >
+              Save Draft
+            </button>
+            <button
+              type="submit"
+              id="submit-btn"
+              class="btn btn-primary relative"
+            >
+              <span id="submit-text">
+                {isEdit 
+                  ? `Update ${postType === 'article' ? 'Article' : 'Note'}`
+                  : `Save ${postType === 'article' ? 'Article' : 'Note'}`
+                }
+              </span>
+              <div id="submit-spinner" class="hidden absolute inset-0 items-center justify-center">
+                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Error State -->
+  <div id="error-state" class="card p-6 hidden">
+    <div class="text-center">
+      <div class="text-apple-red mb-4">
+        <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-apple-gray-900">Failed to load {postType}</h3>
+      <p id="error-message" class="mt-1 text-apple-gray-600">The specified {postType} could not be found</p>
+      <div class="mt-4">
+        <a href={backUrl} class="btn btn-primary">Back to List</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ postType, isEdit, backUrl }}>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const postId = document.getElementById('post-id')?.getAttribute('value') || '';
+    const loadingState = document.getElementById('loading-state');
+    const editorFormContainer = document.getElementById('editor-form-container');
+    const errorState = document.getElementById('error-state');
+    const form = document.getElementById('post-form');
+    const titleInput = document.getElementById('title');
+    const contentTextarea = document.getElementById('content');
+    const submitBtn = document.getElementById('submit-btn');
+    const submitText = document.getElementById('submit-text');
+    const submitSpinner = document.getElementById('submit-spinner');
+    const deleteBtn = document.getElementById('delete-btn');
+    const saveDraftBtn = document.getElementById('save-draft-btn');
+    const messageContainer = document.getElementById('message-container');
+    const autoSaveStatus = document.getElementById('auto-save-status');
+    const titleCount = document.getElementById('title-count');
+    const titleError = document.getElementById('title-error');
+    const tagInput = document.getElementById('tag-input');
+    const tagCount = document.getElementById('tag-count');
+
+    let selectedTags = [];
+    let availableTags = [];
+    let currentPost = null;
+    let easyMDEInstance = null;
+    let autoSaveTimer = null;
+    let isAutoSaving = false;
+
+    // Initialize
+    if (isEdit) {
+      await loadPost();
+    } else {
+      showForm();
+      initializeEditor();
+    }
+    
+    await loadTags();
+    setupTagManagement();
+    setupEventListeners();
+    setupCharacterCounters();
+    setupAutoSave();
+    setupKeyboardShortcuts();
+
+    // Load post data
+    async function loadPost() {
+      try {
+        const response = await window.authFetch(`/api/posts/${postId}`);
+        const result = await response.json();
+
+        if (!result.success) {
+          showError(result.error || `${postType} does not exist`);
+          return;
+        }
+
+        currentPost = result.data;
+        
+        // Verify post type
+        if (currentPost.type !== postType) {
+          showError(`This content is not a ${postType} type`);
+          return;
+        }
+
+        // Populate form
+        titleInput.value = currentPost.title || '';
+        contentTextarea.value = currentPost.content || '';
+        
+        // Set status
+        const statusRadio = document.querySelector(`input[name="status"][value="${currentPost.status}"]`);
+        if (statusRadio) {
+          statusRadio.checked = true;
+        }
+
+        // Set language (if available)
+        if (currentPost.language) {
+          const languageRadio = document.querySelector(`input[name="language"][value="${currentPost.language}"]`);
+          if (languageRadio) {
+            languageRadio.checked = true;
+          }
+        }
+
+        // Load tags
+        selectedTags = currentPost.tags?.map((tag) => tag.name) || [];
+        renderSelectedTags();
+        renderAvailableTags();
+
+        showForm();
+        initializeEditor();
+        
+        // Update character counters
+        if (titleCount && titleInput) {
+          const titleLength = titleInput.value.length;
+          titleCount.textContent = `${titleLength}/100`;
+        }
+        
+        // Set EasyMDE content (ensure set after initialization)
+        setTimeout(() => {
+          if (easyMDEInstance && currentPost.content) {
+            easyMDEInstance.value(currentPost.content);
+          }
+          // Setup auto-save for EasyMDE after it's initialized
+          if (easyMDEInstance) {
+            easyMDEInstance.codemirror.on('change', () => {
+              scheduleAutoSave();
+            });
+          }
+        }, 100);
+
+      } catch (error) {
+        console.error('Failed to load post:', error);
+        showError(`Failed to load ${postType}`);
+      }
+    }
+
+    function showForm() {
+      loadingState.classList.add('hidden');
+      editorFormContainer.classList.remove('hidden');
+    }
+
+    function showError(message) {
+      const errorMessageEl = document.getElementById('error-message');
+      if (errorMessageEl) {
+        errorMessageEl.textContent = message;
+      }
+      loadingState.classList.add('hidden');
+      errorState.classList.remove('hidden');
+    }
+
+    function initializeEditor() {
+      if (window.initMarkdownEditor && contentTextarea) {
+        easyMDEInstance = window.initMarkdownEditor('content', contentTextarea.value);
+      }
+    }
+
+    async function loadTags() {
+      try {
+        const response = await window.authFetch('/api/tags');
+        const result = await response.json();
+        if (result.success) {
+          availableTags = result.data || [];
+          renderAvailableTags();
+        }
+      } catch (error) {
+        console.error('Failed to load tags:', error);
+      }
+    }
+
+    function setupEventListeners() {
+      // Form submission
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await submitPost();
+      });
+
+      // Delete button
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', async () => {
+          if (confirm(`Are you sure you want to delete this ${postType}? This action cannot be undone!`)) {
+            await deletePost();
+          }
+        });
+      }
+
+      // Save draft button
+      if (saveDraftBtn) {
+        saveDraftBtn.addEventListener('click', async () => {
+          await submitPost('draft');
+        });
+      }
+
+      // Status change handler
+      const statusRadios = document.querySelectorAll('input[name="status"]');
+      statusRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          const isDraft = e.target.value === 'draft';
+          saveDraftBtn.classList.toggle('hidden', !isDraft);
+          updateSubmitButtonText();
+        });
+      });
+    }
+
+    // Character counter setup
+    function setupCharacterCounters() {
+      // Title character counter
+      if (titleInput && titleCount) {
+        titleInput.addEventListener('input', () => {
+          const length = titleInput.value.length;
+          titleCount.textContent = `${length}/100`;
+          
+          // Update counter color based on length
+          titleCount.classList.remove('text-slate-400', 'text-orange-500', 'text-red-500');
+          if (length > 95) {
+            titleCount.classList.add('text-red-500');
+          } else if (length > 85) {
+            titleCount.classList.add('text-orange-500');
+          } else {
+            titleCount.classList.add('text-slate-400');
+          }
+
+          // Update input border based on validation
+          if (postType === 'article') {
+            if (length === 0) {
+              titleInput.classList.remove('border-green-300', 'focus:ring-green-500', 'focus:border-green-500');
+              titleInput.classList.add('border-slate-300', 'focus:ring-accent', 'focus:border-accent');
+            } else if (length < 5) {
+              titleInput.classList.remove('border-green-300', 'focus:ring-green-500', 'focus:border-green-500');
+              titleInput.classList.add('border-orange-300', 'focus:ring-orange-500', 'focus:border-orange-500');
+            } else {
+              titleInput.classList.remove('border-orange-300', 'focus:ring-orange-500', 'focus:border-orange-500');
+              titleInput.classList.add('border-green-300', 'focus:ring-green-500', 'focus:border-green-500');
+            }
+          }
+
+          // Clear any previous errors when user starts typing
+          if (titleError && length > 0) {
+            titleError.classList.add('hidden');
+          }
+        });
+      }
+
+      // Tag input character counter
+      if (tagInput && tagCount) {
+        tagInput.addEventListener('input', () => {
+          const length = tagInput.value.length;
+          tagCount.textContent = `${length}/20`;
+          
+          if (length > 15) {
+            tagCount.classList.add('text-orange-500');
+          } else if (length > 18) {
+            tagCount.classList.add('text-red-500');
+          } else {
+            tagCount.classList.remove('text-orange-500', 'text-red-500');
+          }
+        });
+      }
+    }
+
+    // Auto-save functionality
+    function setupAutoSave() {
+      if (!isEdit) return; // Only enable auto-save for existing posts
+
+      const inputs = [titleInput, tagInput];
+      
+      inputs.forEach(input => {
+        if (input) {
+          input.addEventListener('input', () => {
+            scheduleAutoSave();
+          });
+        }
+      });
+
+      // Also listen for EasyMDE changes
+      if (easyMDEInstance) {
+        easyMDEInstance.codemirror.on('change', () => {
+          scheduleAutoSave();
+        });
+      }
+    }
+
+    function scheduleAutoSave() {
+      if (isAutoSaving) return;
+
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(async () => {
+        await performAutoSave();
+      }, 3000); // Auto-save after 3 seconds of inactivity
+    }
+
+    async function performAutoSave() {
+      if (isAutoSaving || !isEdit) return;
+      
+      isAutoSaving = true;
+      
+      try {
+        const editorContent = easyMDEInstance ? easyMDEInstance.value() : contentTextarea.value;
+        
+        const postData = {
+          title: titleInput.value,
+          content: editorContent,
+          type: postType,
+          status: 'draft', // Always save as draft for auto-save
+          language: document.querySelector('input[name="language"]:checked')?.value || 'auto',
+          tags: selectedTags
+        };
+
+        const response = await window.authFetch(`/api/posts/${postId}`, {
+          method: 'PUT',
+          body: JSON.stringify(postData),
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+          showAutoSaveStatus('saved');
+        } else {
+          showAutoSaveStatus('error');
+        }
+      } catch (error) {
+        console.error('Auto-save error:', error);
+        showAutoSaveStatus('error');
+      } finally {
+        isAutoSaving = false;
+      }
+    }
+
+    function showAutoSaveStatus(status) {
+      if (!autoSaveStatus) return;
+      
+      autoSaveStatus.classList.remove('hidden');
+      autoSaveStatus.classList.add('flex');
+      
+      if (status === 'saved') {
+        autoSaveStatus.innerHTML = `
+          <svg class="w-4 h-4 mr-1 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <span class="text-green-600">Auto-saved</span>
+        `;
+      } else {
+        autoSaveStatus.innerHTML = `
+          <svg class="w-4 h-4 mr-1 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+          </svg>
+          <span class="text-red-600">Save failed</span>
+        `;
+      }
+      
+      setTimeout(() => {
+        autoSaveStatus.classList.add('hidden');
+        autoSaveStatus.classList.remove('flex');
+      }, 3000);
+    }
+
+    // Keyboard shortcuts
+    function setupKeyboardShortcuts() {
+      document.addEventListener('keydown', (e) => {
+        // Ctrl+S / Cmd+S for save
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          submitPost();
+        }
+        
+        // Ctrl+Shift+S / Cmd+Shift+S for save as draft
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') {
+          e.preventDefault();
+          submitPost('draft');
+        }
+      });
+    }
+
+    function updateSubmitButtonText() {
+      if (!submitText) return;
+      
+      const selectedStatus = document.querySelector('input[name="status"]:checked')?.value;
+      const isDraft = selectedStatus === 'draft';
+      
+      if (isEdit) {
+        submitText.textContent = isDraft ? 'Save as Draft' : `Update ${postType === 'article' ? 'Article' : 'Note'}`;
+      } else {
+        submitText.textContent = isDraft ? 'Save Draft' : `Publish ${postType === 'article' ? 'Article' : 'Note'}`;
+      }
+    }
+
+    function setupTagManagement() {
+      if (addTagBtn && tagInput) {
+        // Enhanced add tag functionality
+        const addTag = () => {
+          const tagName = tagInput.value.trim();
+          if (tagName && !selectedTags.includes(tagName)) {
+            if (tagName.length > 20) {
+              showMessage('Tag name cannot exceed 20 characters', 'error');
+              return;
+            }
+            selectedTags.push(tagName);
+            tagInput.value = '';
+            tagCount.textContent = '0/20';
+            renderSelectedTags();
+            renderAvailableTags();
+            scheduleAutoSave(); // Trigger auto-save when tags change
+          }
+        };
+
+        addTagBtn.addEventListener('click', addTag);
+
+        tagInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            addTag();
+          }
+        });
+
+        // Enhanced tag input validation
+        tagInput.addEventListener('input', (e) => {
+          const value = e.target.value;
+          // Remove invalid characters
+          const cleanValue = value.replace(/[^a-zA-Z0-9\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\-_]/g, '');
+          if (cleanValue !== value) {
+            e.target.value = cleanValue;
+          }
+        });
+      }
+
+      // Global functions for tag management
+      window.removeTag = function(tagName) {
+        selectedTags = selectedTags.filter(tag => tag !== tagName);
+        renderSelectedTags();
+        renderAvailableTags();
+        scheduleAutoSave(); // Trigger auto-save when tags change
+      };
+
+      window.addExistingTag = function(tagName) {
+        if (!selectedTags.includes(tagName)) {
+          selectedTags.push(tagName);
+          renderSelectedTags();
+          renderAvailableTags();
+          scheduleAutoSave(); // Trigger auto-save when tags change
+        }
+      };
+    }
+
+    function renderSelectedTags() {
+      const container = document.getElementById('selected-tags');
+      if (container) {
+        if (selectedTags.length === 0) {
+                      container.innerHTML = `
+              <div class="flex items-center text-slate-400 text-sm py-3">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                No tags selected. Add tags to help categorize your content.
+              </div>
+            `;
+        } else {
+          container.innerHTML = selectedTags.map(tag => `
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-accent text-white hover:bg-accent/90 transition-colors">
+              ${tag}
+              <button type="button" class="ml-2 hover:text-slate-200 transition-colors" onclick="removeTag('${tag}')" title="Remove tag">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </span>
+          `).join('');
+        }
+      }
+    }
+
+    function renderAvailableTags() {
+      const container = document.getElementById('available-tags');
+      if (container) {
+        const unusedTags = availableTags.filter(tag => !selectedTags.includes(tag.name));
+        container.innerHTML = unusedTags.map(tag => `
+          <button
+            type="button"
+            class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-slate-100 text-slate-700 hover:bg-slate-200"
+            onclick="addExistingTag('${tag.name}')"
+          >
+            ${tag.name}
+          </button>
+        `).join('');
+      }
+    }
+
+    async function submitPost(forceStatus = null) {
+      // Validation
+      if (postType === 'article' && !titleInput.value.trim()) {
+        showMessage('Please enter article title', 'error');
+        titleInput.focus();
+        if (titleError) {
+          const errorText = document.getElementById('title-error-text');
+          if (errorText) {
+            errorText.textContent = 'Article title is required. Please enter a meaningful title.';
+          }
+          titleError.classList.remove('hidden');
+        }
+        return;
+      }
+
+      // Get editor content, prefer EasyMDE instance, otherwise use textarea value
+      const editorContent = easyMDEInstance ? easyMDEInstance.value() : contentTextarea.value;
+      
+      if (!editorContent.trim()) {
+        showMessage(`Please enter ${postType} content`, 'error');
+        // If EasyMDE instance exists, focus the editor
+        if (easyMDEInstance) {
+          easyMDEInstance.codemirror.focus();
+        }
+        return;
+      }
+
+      // Get status - use forceStatus if provided, otherwise get from form
+      const selectedStatus = forceStatus || document.querySelector('input[name="status"]:checked')?.value;
+      if (!selectedStatus) {
+        showMessage('Please select a status (Save Draft or Publish Now)', 'error');
+        return;
+      }
+
+      // Update button states
+      const isSubmitButton = !forceStatus;
+      const targetButton = isSubmitButton ? submitBtn : saveDraftBtn;
+      
+      if (targetButton) {
+        targetButton.disabled = true;
+      }
+
+              // Show loading state
+        if (isSubmitButton && submitText && submitSpinner) {
+          submitText.classList.add('opacity-0');
+          submitSpinner.classList.remove('hidden');
+          submitSpinner.classList.add('flex');
+        }
+
+      try {
+        const postData = {
+          title: titleInput.value,
+          content: editorContent,
+          type: postType,
+          status: selectedStatus,
+          language: document.querySelector('input[name="language"]:checked')?.value || 'auto',
+          tags: selectedTags
+        };
+
+        const url = isEdit ? `/api/posts/${postId}` : '/api/posts';
+        const method = isEdit ? 'PUT' : 'POST';
+
+        const response = await window.authFetch(url, {
+          method,
+          body: JSON.stringify(postData),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          const actionText = selectedStatus === 'draft' ? 'saved as draft' : (isEdit ? 'updated' : 'published');
+          showMessage(`${postType === 'article' ? 'Article' : 'Note'} ${actionText} successfully!`, 'success');
+          
+          // Clear auto-save timer since we just saved
+          clearTimeout(autoSaveTimer);
+          
+          setTimeout(() => {
+            window.location.href = backUrl;
+          }, 1000);
+        } else {
+          showMessage(result.error || `${isEdit ? 'Update' : 'Save'} failed`, 'error');
+        }
+      } catch (error) {
+        console.error('Submit error:', error);
+        showMessage('Network error, please try again later', 'error');
+      } finally {
+        // Reset button states
+        if (targetButton) {
+          targetButton.disabled = false;
+        }
+
+        if (isSubmitButton && submitText && submitSpinner) {
+          submitText.classList.remove('opacity-0');
+          submitSpinner.classList.add('hidden');
+          submitSpinner.classList.remove('flex');
+        }
+        
+        updateSubmitButtonText();
+      }
+    }
+
+    async function deletePost() {
+      if (!isEdit || !deleteBtn) return;
+
+      deleteBtn.disabled = true;
+      deleteBtn.textContent = 'Deleting...';
+
+      try {
+        const response = await window.authFetch(`/api/posts/${postId}`, {
+          method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showMessage(`${postType === 'article' ? 'Article' : 'Note'} deleted successfully!`, 'success');
+          setTimeout(() => {
+            window.location.href = backUrl;
+          }, 1000);
+        } else {
+          showMessage(result.error || 'Delete failed', 'error');
+          deleteBtn.disabled = false;
+          deleteBtn.textContent = `Delete ${postType === 'article' ? 'Article' : 'Note'}`;
+        }
+      } catch (error) {
+        console.error('Delete error:', error);
+        showMessage('Network error, please try again later', 'error');
+        deleteBtn.disabled = false;
+        deleteBtn.textContent = `Delete ${postType === 'article' ? 'Article' : 'Note'}`;
+      }
+    }
+
+    function showMessage(message, type) {
+      const bgColor = type === 'success' ? 'bg-green-50' : 'bg-red-50';
+      const textColor = type === 'success' ? 'text-green-800' : 'text-red-800';
+      const borderColor = type === 'success' ? 'border-green-200' : 'border-red-200';
+      const iconSvg = type === 'success' 
+        ? `<svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+           </svg>`
+        : `<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+           </svg>`;
+      
+      messageContainer.innerHTML = `
+        <div class="rounded-md ${bgColor} border ${borderColor} p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              ${iconSvg}
+            </div>
+            <div class="ml-3">
+              <p class="${textColor} text-sm font-medium">${message}</p>
+            </div>
+          </div>
+        </div>
+      `;
+      messageContainer.classList.remove('hidden');
+      
+      // Auto-scroll to message container
+      messageContainer.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start',
+        inline: 'nearest'
+      });
+      
+      // Auto-hide success messages, keep error messages visible longer
+      const hideDelay = type === 'success' ? 3000 : 8000;
+      setTimeout(() => {
+        messageContainer.classList.add('hidden');
+      }, hideDelay);
+    }
+  });
+</script> 

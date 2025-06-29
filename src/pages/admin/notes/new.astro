@@ -1,0 +1,14 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import PostEditor from '../../../components/PostEditor.astro';
+
+export const prerender = false;
+---
+
+<AdminLayout title="New Note">
+	<PostEditor 
+		postType="note"
+		title="New Note"
+		backUrl="/admin"
+	/>
+</AdminLayout> 

@@ -1,38 +1,73 @@
 {
-  "name": "astro-blog-starter-template",
+  "name": "astro-d1-blog",
   "description": "Build a personal website, blog, or portfolio with Astro.",
   "cloudflare": {
-    "label": "Astro Framework Starter",
+    "label": "Astro D1 Blog",
     "products": [
       "Workers"
     ],
     "categories": [],
-    "icon_urls": [
-      "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/5ca0ca32-e897-4699-d4c1-6b680512f000/public"
-    ],
-    "preview_image_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/33bbbf02-eda2-4d3f-b244-c27a280f3900/public",
     "publish": true
   },
   "dependencies": {
-    "@astrojs/cloudflare": "12.6.0",
     "@astrojs/mdx": "4.3.0",
     "@astrojs/rss": "4.0.11",
     "@astrojs/sitemap": "3.4.1",
+    "@astrojs/tailwind": "^6.0.2",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/jszip": "^3.4.0",
     "astro": "5.10.1",
-    "typescript": "5.8.3"
+    "drizzle-kit": "^0.31.4",
+    "drizzle-orm": "^0.44.2",
+    "easymde": "^2.20.0",
+    "franc": "^6.2.0",
+    "jszip": "^3.10.1",
+    "marked": "^16.0.0",
+    "pinyin": "^4.0.0",
+    "tailwindcss": "^3.4.17",
+    "typescript": "5.8.3",
+    "wanakana": "^5.3.1"
   },
   "devDependencies": {
+    "@astrojs/cloudflare": "^12.6.0",
+    "@types/marked": "^5.0.2",
     "@types/node": "^24.0.6",
+    "@vitest/ui": "^3.2.4",
+    "vitest": "^3.2.4",
     "wrangler": "^4.22.0"
   },
   "scripts": {
     "astro": "astro",
     "build": "astro build",
-    "cf-typegen": "wrangler types",
-    "check": "astro build && tsc && wrangler deploy --dry-run",
-    "deploy": "wrangler deploy",
     "dev": "astro dev",
-    "preview": "astro build && wrangler dev"
+    "preview": "astro build && wrangler dev",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
+    "cf-typegen": "wrangler types",
+    "check": "astro build && tsc && wrangler deploy --dry-run --env=\"\"",
+    "check:prod": "astro build && tsc && wrangler deploy --dry-run --env production",
+    "deploy": "wrangler deploy --env=\"\"",
+    "deploy:prod": "wrangler deploy --env production",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:migrate:local": "for f in ./migrations/*.sql; do npx wrangler d1 execute blog-local --local --file=\"$f\"; done",
+    "db:init-full:local": "npm run db:migrate:local && npm run db:seed:local",
+    "db:reset:local": "rm -rf .wrangler/state/v3/d1 && npm run db:init-full:local",
+    "db:seed:local": "npx wrangler d1 execute blog-local --local --file=./scripts/seed-tags.sql && npx wrangler d1 execute blog-local --local --file=./scripts/seed-site-config.sql && npx wrangler d1 execute blog-local --local --file=./scripts/seed-data.sql",
+    "db:migrate:dev": "for f in ./migrations/*.sql; do npx wrangler d1 execute blog-dev --file=\"$f\"; done",
+    "db:init:dev": "npm run db:migrate:dev && npm run db:seed:dev",
+    "db:init-full:dev": "npm run db:init:dev",
+    "db:reset:dev": "npx wrangler d1 execute blog-dev --command=\"DROP TABLE IF EXISTS post_tags; DROP TABLE IF EXISTS posts; DROP TABLE IF EXISTS tags; DROP TABLE IF EXISTS site_config;\" && npm run db:init-full:dev",
+    "db:seed:dev": "npx wrangler d1 execute blog-dev --file=./scripts/seed-tags.sql && npx wrangler d1 execute blog-dev --file=./scripts/seed-site-config.sql && npx wrangler d1 execute blog-dev --file=./scripts/seed-data.sql",
+    "db:migrate:prod": "for f in ./migrations/*.sql; do npx wrangler d1 execute blog-prod --file=\"$f\"; done",
+    "db:init:prod": "npm run db:migrate:prod && npm run db:seed:prod && npm run db:seed-config:prod",
+    "db:init-full:prod": "npm run db:init:prod && npm run db:seed-data:prod",
+    "db:seed:prod": "npx wrangler d1 execute blog-prod --file=./scripts/seed-tags.sql",
+    "db:seed-data:prod": "npx wrangler d1 execute blog-prod --file=./scripts/seed-data.sql",
+    "db:seed-config:prod": "npx wrangler d1 execute blog-prod --file=./scripts/seed-site-config.sql"
   },
   "type": "module"
 }

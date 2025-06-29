@@ -1,0 +1,130 @@
+---
+export const prerender = false;
+
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PostCard from '../../components/PostCard.astro';
+import Pagination from '../../components/Pagination.astro';
+import { SITE_TITLE } from '../../consts';
+import { createRepositories } from '../../db/database';
+import { getSiteConfigWithFallback } from '../../lib/config';
+import type { PostWithTags } from '../../types/database';
+
+let posts: PostWithTags[] = [];
+let currentPage = 1;
+let totalPages = 1;
+let selectedTag: string | null = null;
+
+try {
+  const url = new URL(Astro.request.url);
+  currentPage = parseInt(url.searchParams.get('page') || '1');
+  selectedTag = url.searchParams.get('tag');
+  
+  if (Astro.locals.runtime?.env.DB) {
+    const repositories = createRepositories(Astro.locals.runtime.env.DB);
+    const result = await repositories.posts.findMany({ 
+      page: currentPage, 
+      limit: 10, 
+      status: 'published',
+      type: 'note',
+      tag: selectedTag || undefined
+    });
+    posts = result.posts as any as PostWithTags[];
+    totalPages = Math.ceil(result.total / 10);
+  } else {
+    console.warn('No D1 database available');
+    posts = [];
+  }
+} catch (error) {
+  console.error('Error fetching posts:', error);
+  posts = [];
+}
+
+const pageTitle = selectedTag ? `Notes tagged "${selectedTag}"` : "Notes";
+const pageDescription = selectedTag 
+  ? `Quick thoughts and shares about ${selectedTag}.`
+  : "Quick thoughts and brief shares, capturing moments of life and work insights.";
+
+// Get site configuration for footer
+const siteConfig = await getSiteConfigWithFallback(Astro.locals.runtime?.env.DB);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`${pageTitle} | ${SITE_TITLE}`} description={pageDescription} />
+	</head>
+	<body>
+		<Header siteTitle={siteConfig.brandName} />
+		
+		<main class="container-responsive py-8 lg:py-16">
+			<!-- Page Header -->
+			<header class="mb-12 lg:mb-16">
+				<div class="max-w-3xl mx-auto text-center">
+					<h1 class="text-4xl lg:text-5xl font-bold text-slate-900 mb-6 text-balance">
+						{selectedTag ? (
+							<>
+								<span class="text-slate-500">#</span>
+								<span class="text-amber-600">{selectedTag}</span>
+								<span class="block text-2xl lg:text-3xl font-medium text-slate-600 mt-2">Notes</span>
+							</>
+						) : 'Notes'}
+					</h1>
+					<p class="text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto">
+						{pageDescription}
+					</p>
+					{selectedTag && (
+						<div class="mt-6">
+							<a 
+								href="/notes" 
+								class="inline-flex items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors"
+							>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+								</svg>
+								View all notes
+							</a>
+						</div>
+					)}
+				</div>
+			</header>
+
+			<!-- Notes Grid -->
+			<section class="max-w-5xl mx-auto">
+				{posts.length > 0 ? (
+					<div class="grid gap-6 md:grid-cols-2 lg:gap-8">
+						{posts.map((post) => (
+							<article class="group">
+								<PostCard post={post} showExcerpt={false} />
+							</article>
+						))}
+					</div>
+				) : (
+					<div class="text-center py-20 lg:py-24">
+						<div class="w-24 h-24 mx-auto mb-6 bg-amber-50 rounded-full flex items-center justify-center">
+							<svg class="w-12 h-12 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+							</svg>
+						</div>
+						<h3 class="text-2xl font-semibold text-slate-900 mb-3">No Notes Yet</h3>
+						<p class="text-lg text-slate-600 max-w-md mx-auto">No notes have been shared yet. Check back soon for quick thoughts and insights!</p>
+					</div>
+				)}
+			</section>
+
+			<!-- Pagination -->
+			{totalPages > 1 && (
+				<nav class="mt-16 lg:mt-20" aria-label="Pagination">
+					<Pagination 
+						currentPage={currentPage}
+						totalPages={totalPages}
+						baseUrl="/notes"
+					/>
+				</nav>
+			)}
+		</main>
+		
+		<Footer siteTitle={siteConfig.brandName} socialLinks={siteConfig.socialLinks || []} />
+	</body>
+</html> 

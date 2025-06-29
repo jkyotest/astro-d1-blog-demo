@@ -1,0 +1,174 @@
+---
+export const prerender = false;
+
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PostCard from '../../components/PostCard.astro';
+import Pagination from '../../components/Pagination.astro';
+import { SITE_TITLE } from '../../consts';
+import { createRepositories } from '../../db/database';
+import { getSiteConfigWithFallback } from '../../lib/config';
+import type { PostWithTags } from '../../types/database';
+
+let posts: any[] = [];
+let currentPage = 1;
+let totalPages = 1;
+
+let selectedTag: string | null = null;
+
+try {
+  const url = new URL(Astro.request.url);
+  currentPage = parseInt(url.searchParams.get('page') || '1');
+  selectedTag = url.searchParams.get('tag');
+  
+  if (Astro.locals.runtime?.env.DB) {
+    const repositories = createRepositories(Astro.locals.runtime.env.DB);
+    const result = await repositories.posts.findMany({ 
+      page: currentPage, 
+      limit: 12, 
+      type: 'article',
+      status: 'published',
+      tag: selectedTag || undefined
+    });
+    posts = result.posts;
+    totalPages = Math.ceil(result.total / 12);
+  }
+} catch (error) {
+  console.error('Blog page error:', error);
+}
+
+const pageTitle = selectedTag ? `Articles tagged "${selectedTag}"` : 'Articles';
+const pageDescription = selectedTag 
+  ? `In-depth articles about ${selectedTag}.`
+  : 'In-depth articles about technology, development, and more.';
+
+// Get site configuration for footer
+const siteConfig = await getSiteConfigWithFallback(Astro.locals.runtime?.env.DB);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`${pageTitle} - ${SITE_TITLE}`} description={pageDescription} />
+	</head>
+	<body>
+		<Header siteTitle={siteConfig.brandName} />
+		
+		<main class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+			<!-- Page Header -->
+			<header class="bg-white/80 backdrop-blur-sm border-b border-slate-200/60">
+				<div class="container-responsive py-12 lg:py-16">
+					<div class="max-w-4xl mx-auto">
+						{selectedTag ? (
+							<div class="text-center space-y-4">
+								<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">
+									<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M9.243 3.03a1 1 0 01.727 1.213L9.53 6h2.94l.56-2.243a1 1 0 111.94.486L14.53 6H17a1 1 0 110 2h-2.97l-1 4H15a1 1 0 110 2h-2.47l-.56 2.242a1 1 0 11-1.94-.485L10.47 14H7.53l-.56 2.242a1 1 0 11-1.94-.485L5.47 14H3a1 1 0 110-2h2.97l1-4H5a1 1 0 110-2h2.47l.56-2.243a1 1 0 011.213-.727zM9.03 8l-1 4h2.94l1-4H9.03z" clip-rule="evenodd" />
+									</svg>
+									{selectedTag}
+								</div>
+								<h1 class="text-3xl lg:text-4xl font-bold text-slate-900">
+									Articles about {selectedTag}
+								</h1>
+								<p class="text-lg text-slate-600 max-w-2xl mx-auto">
+									{pageDescription}
+								</p>
+								<a 
+									href="/articles" 
+									class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+								>
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+									</svg>
+									View all articles
+								</a>
+							</div>
+						) : (
+							<div class="text-center space-y-6">
+								<div class="space-y-4">
+									<h1 class="text-4xl lg:text-5xl font-bold text-slate-900 text-balance">
+										Articles
+									</h1>
+									<p class="text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto">
+										{pageDescription}
+									</p>
+								</div>
+								<div class="flex items-center justify-center gap-4 text-sm text-slate-500">
+									<span class="flex items-center gap-1">
+										<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+											<path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+										</svg>
+										{posts.length} articles
+									</span>
+									<span>•</span>
+									<a href="/notes" class="hover:text-blue-600 transition-colors">
+										View notes →
+									</a>
+								</div>
+							</div>
+						)}
+					</div>
+				</div>
+			</header>
+
+			<!-- Articles List -->
+			<section class="container-responsive py-12 lg:py-16">
+				<div class="max-w-5xl mx-auto">
+					{posts.length > 0 ? (
+						<div class="grid gap-6 lg:gap-8">
+							{posts.map((post) => (
+								<PostCard post={post} showExcerpt={true} />
+							))}
+						</div>
+					) : (
+						<div class="text-center py-20 lg:py-24">
+							<div class="w-24 h-24 mx-auto mb-8 bg-gradient-to-br from-blue-100 to-slate-100 rounded-2xl flex items-center justify-center">
+								<svg class="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+								</svg>
+							</div>
+							<div class="space-y-4">
+								<h3 class="text-2xl font-semibold text-slate-900">No Articles Yet</h3>
+								<p class="text-lg text-slate-600 max-w-md mx-auto leading-relaxed">
+									No articles have been published yet. Check back soon for new content!
+								</p>
+							</div>
+							<div class="mt-8">
+								<a 
+									href="/notes" 
+									class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+								>
+									Explore Notes Instead
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+									</svg>
+								</a>
+							</div>
+						</div>
+					)}
+				</div>
+			</section>
+
+			<!-- Pagination -->
+			{totalPages > 1 && (
+				<section class="container-responsive pb-12 lg:pb-16">
+					<div class="max-w-5xl mx-auto">
+						<nav aria-label="Pagination">
+							<Pagination 
+								currentPage={currentPage}
+								totalPages={totalPages}
+								baseUrl="/articles"
+							/>
+						</nav>
+					</div>
+				</section>
+			)}
+		</main>
+		
+		<Footer 
+			siteTitle={siteConfig.brandName}
+			socialLinks={siteConfig.socialLinks || []}
+		/>
+	</body>
+</html>
