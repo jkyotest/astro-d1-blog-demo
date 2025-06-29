@@ -1,4 +1,6 @@
 ---
+export const prerender = false;
+
 // Tags page - displays all available tags
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
@@ -7,8 +9,6 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { createRepositories } from '../db/database';
 import { getSiteConfigWithFallback } from '../lib/config';
 import type { Tag } from '../types/database';
-
-export const prerender = false;
 
 // Fetch tags from database
 let tags: Tag[] = [];
